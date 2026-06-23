@@ -962,14 +962,15 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 .s-adiado{background:#f0f0f0;color:#6e6e73;}
 /* Month select */
 .rdm-month-sel{border:none;background:transparent;font-size:11px;font-family:inherit;cursor:pointer;width:100%;padding:0;outline:none;appearance:none;-webkit-appearance:none;color:var(--navy);}
-td.prazo-vencido{background:#fff5f5;}
-td.prazo-vencido .rdm-month-sel{color:#b71a1a;font-weight:700;}
-td.prazo-urgente{background:#fffbf0;}
-td.prazo-urgente .rdm-month-sel{color:#b76200;font-weight:700;}
+td.prazo-atual .rdm-month-sel{font-weight:700;color:var(--navy);}
+td.co-ontime .rdm-month-sel{color:#1a7a4a;font-weight:600;}
+td.co-late .rdm-month-sel{color:#b71a1a;font-weight:600;}
 /* Responsável multi-select */
-.rdm-resp-cell{position:relative;cursor:pointer;}
-.rdm-resp-display{font-size:11px;color:var(--navy);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rdm-resp-cell{position:relative;}
+.rdm-resp-trigger{cursor:pointer;display:flex;align-items:center;gap:4px;}
+.rdm-resp-display{font-size:11px;color:var(--navy);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .rdm-resp-display.empty{color:var(--g300);font-style:italic;}
+.rdm-resp-arrow{color:var(--g400);font-size:9px;flex-shrink:0;}
 .rdm-resp-dd{position:absolute;top:calc(100% + 2px);left:0;background:#fff;border:1px solid var(--g200);border-radius:8px;padding:6px;z-index:200;min-width:150px;box-shadow:0 4px 16px rgba(0,0,0,.12);display:none;}
 .rdm-resp-dd label{display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:11px;cursor:pointer;border-radius:5px;white-space:nowrap;}
 .rdm-resp-dd label:hover{background:var(--g50);}
@@ -988,7 +989,7 @@ td.prazo-urgente .rdm-month-sel{color:#b76200;font-weight:700;}
 
 <div class="rdm-top">
   <div class="rdm-title">Roadmap 2026</div>
-  <div class="rdm-subtitle">Ocean Talent Solutions · <span style="color:#b71a1a;font-weight:700;">Vermelho</span> = vencido · <span style="color:#b76200;font-weight:700;">Laranja</span> = mês corrente</div>
+  <div class="rdm-subtitle">Ocean Talent Solutions · Prazo em <strong>negrito</strong> = mês atual · Conclusão <span style="color:#1a7a4a;font-weight:600;">verde</span> = no prazo · <span style="color:#b71a1a;font-weight:600;">vermelha</span> = fora do prazo</div>
 </div>
 <div class="rdm-summary" id="rdm-summary"></div>
 <div class="rdm-toolbar" id="rdm-toolbar">
@@ -1043,9 +1044,17 @@ function monthCls(val){
   const p=val.split('/');if(p.length!==2)return '';
   const m=MONTH_N[p[0]],y=2000+parseInt(p[1]);
   const now=new Date(),cm=now.getMonth()+1,cy=now.getFullYear();
-  if(y<cy||(y===cy&&m<cm))return 'prazo-vencido';
-  if(y===cy&&m===cm)return 'prazo-urgente';
-  return '';
+  return (y===cy&&m===cm)?'prazo-atual':'';
+}
+function monthNum(val){
+  if(!val)return null;
+  const p=val.split('/');if(p.length!==2)return null;
+  return (2000+parseInt(p[1]))*12+(MONTH_N[p[0]]||0);
+}
+function conclusaoCls(coVal,pVal){
+  const co=monthNum(coVal);if(!co)return '';
+  const p=monthNum(pVal);
+  return (!p||co<=p)?'co-ontime':'co-late';
 }
 function monthOpts(cur){
   return MONTHS.map(o=>`<option value="${o.v}"${o.v===cur?' selected':''}>${o.l}</option>`).join('');
@@ -1239,12 +1248,15 @@ function renderGroup(g){
       <td contenteditable="true" data-ph="Área" class="${!t.a?'ce-empty':''}"
           onblur="rdmCell('${g.id}','${t.id}','a',this)">${t.a}</td>
       <td><select class="stsel ${sc}" onchange="rdmStatus('${g.id}','${t.id}',this)">${stOpts(t.s)}</select></td>
-      <td class="rdm-resp-cell" onclick="rdmRespToggle(event,'${key}')">
-        <span class="rdm-resp-display${t.r?'':' empty'}" id="rdm-resp-disp-${key}">${t.r||'—'}</span>
+      <td class="rdm-resp-cell">
+        <div class="rdm-resp-trigger" onclick="rdmRespToggle(event,'${key}')">
+          <span class="rdm-resp-display${t.r?'':' empty'}" id="rdm-resp-disp-${key}">${t.r||'—'}</span>
+          <span class="rdm-resp-arrow">▾</span>
+        </div>
         <div class="rdm-resp-dd" id="rdm-resp-dd-${key}" onclick="event.stopPropagation()">${respChecks}</div>
       </td>
       <td class="${mc}"><select class="rdm-month-sel" onchange="rdmMonth('${g.id}','${t.id}','p',this)">${monthOpts(t.p)}</select></td>
-      <td><select class="rdm-month-sel" onchange="rdmMonth('${g.id}','${t.id}','co',this)">${monthOpts(t.co)}</select></td>
+      <td class="${conclusaoCls(t.co,t.p)}"><select class="rdm-month-sel" onchange="rdmMonth('${g.id}','${t.id}','co',this)">${monthOpts(t.co)}</select></td>
       <td style="text-align:center;"><button class="rdm-exp-btn" id="rdm-expbtn-${key}" onclick="rdmExpand('${g.id}','${t.id}')">${isExp?'▾':'▸'}</button></td>
     </tr>
     <tr class="rdm-expand-row" id="rdm-exp-${key}" style="display:${isExp?'':'none'};">
