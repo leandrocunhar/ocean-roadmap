@@ -984,21 +984,20 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
   <span class="rft">Filtrar:</span>
   <button class="rfb active" data-f="all">Todas</button>
   <button class="rfb" data-f="Feito">✓ Feito</button>
+  <button class="rfb" data-f="Validar">Validar</button>
   <button class="rfb" data-f="Em andamento">Em andamento</button>
-  <button class="rfb" data-f="Validação">Validação</button>
   <button class="rfb" data-f="Iniciar">Iniciar</button>
   <button class="rfb" data-f="Bloqueado">Bloqueado</button>
   <button class="rfb" data-f="Adiado">Adiado</button>
   <span class="rdm-saved" id="rdm-saved"></span>
-  <button class="rdm-reset" onclick="rdmReset()">↺ Resetar</button>
 </div>
 <div id="rdm-body"></div>
 </div>
 
 <script>
 (function(){
-const SC={'Feito':'s-feito','Em andamento':'s-andamento','Validação':'s-validacao','Iniciar':'s-iniciar','Bloqueado':'s-bloqueado','Adiado':'s-adiado'};
-const SS=['Feito','Validação','Em andamento','Iniciar','Bloqueado','Adiado'];
+const SC={'Feito':'s-feito','Em andamento':'s-andamento','Validar':'s-validacao','Iniciar':'s-iniciar','Bloqueado':'s-bloqueado','Adiado':'s-adiado'};
+const SS=['Feito','Validar','Em andamento','Iniciar','Bloqueado','Adiado'];
 const COL={red:'#c0392b',orange:'#e67e22',blue:'#1a4db7',gray:'#5a5a5f'};
 
 const DEF=[
