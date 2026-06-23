@@ -894,11 +894,262 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 </div><!-- /page-diagnostico -->
 
 <div id="page-roadmap" style="display:none;">
-  <div class="roadmap-empty">
-    <span class="re-icon">🗺️</span>
-    <h2>Roadmap em construção</h2>
-    <p>Esta seção apresentará o plano de reestruturação da Ocean para 2026–2027.</p>
-  </div>
+<div id="rdm-wrap" style="padding:20px 24px;max-width:1200px;margin:0 auto;">
+<style>
+#rdm-wrap{font-family:'Inter',-apple-system,sans-serif;}
+.rdm-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.rdm-title{font-size:18px;font-weight:800;color:var(--navy);}
+.rdm-subtitle{font-size:12px;color:var(--g500);margin-top:2px;}
+.rdm-summary{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.rsc{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:10px 14px;min-width:100px;}
+.rsc .rv{font-size:20px;font-weight:800;color:var(--navy);}
+.rsc .rl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g500);margin-top:1px;}
+.rsc.rc-prog{min-width:160px;}
+.rdm-prog-bar-outer{background:var(--g200);height:6px;border-radius:3px;margin-top:6px;overflow:hidden;}
+.rdm-prog-bar-inner{height:100%;background:#1a7a4a;border-radius:3px;transition:.3s;}
+.rdm-toolbar{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+.rft{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g500);margin-right:4px;}
+.rfb{padding:5px 11px;border:1px solid var(--g200);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--g600);transition:.15s;font-family:inherit;}
+.rfb.active,.rfb:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.rdm-saved{font-size:10px;color:var(--g400);margin-left:auto;}
+.rdm-reset{padding:5px 11px;font-size:11px;border:1px solid var(--g200);border-radius:6px;background:#fff;color:var(--g600);cursor:pointer;font-family:inherit;}
+.rdm-reset:hover{border-color:#c00;color:#c00;}
+.rdm-group{margin-bottom:18px;border-radius:10px;overflow:hidden;border:1px solid var(--g200);}
+.rdm-gh{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none;background:#fff;}
+.rdm-gh:hover{background:var(--g50);}
+.rdm-badge{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap;}
+.rdm-gtitle{font-size:13px;font-weight:700;color:var(--navy);flex:1;}
+.rdm-horiz{font-size:10px;color:var(--g500);font-weight:600;white-space:nowrap;}
+.rdm-gprog{display:flex;align-items:center;gap:6px;}
+.rdm-gpb{width:72px;height:4px;background:var(--g200);border-radius:2px;overflow:hidden;}
+.rdm-gpf{height:100%;border-radius:2px;transition:.4s;}
+.rdm-gpct{font-size:10px;font-weight:700;color:var(--g500);min-width:26px;text-align:right;}
+.rdm-chev{color:var(--g400);font-size:12px;margin-left:4px;}
+.rdm-tbl-wrap{overflow-x:auto;}
+.rdm-tbl{width:100%;border-collapse:collapse;background:#fff;}
+.rdm-tbl th{background:var(--g50);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g500);padding:7px 11px;text-align:left;border-bottom:1px solid var(--g200);white-space:nowrap;}
+.rdm-tbl td{padding:8px 11px;font-size:12px;color:var(--navy);border-bottom:1px solid #f0f0f2;vertical-align:middle;}
+.rdm-tbl tr:last-child td{border-bottom:none;}
+.rdm-tbl tr:hover td{background:#fafafa;}
+.rdm-tbl td[contenteditable]{outline:none;cursor:text;border-radius:3px;}
+.rdm-tbl td[contenteditable]:focus{background:#fffbea;box-shadow:inset 0 0 0 1.5px #f5a623;}
+.rdm-tbl td[contenteditable]:empty:before{content:attr(data-ph);color:var(--g300);font-style:italic;}
+.stsel{border:none;font-size:11px;font-weight:700;cursor:pointer;padding:3px 6px;border-radius:4px;outline:none;appearance:none;-webkit-appearance:none;font-family:inherit;}
+.s-feito{background:#e6f9ef;color:#1a7a4a;}
+.s-andamento{background:#e6f0ff;color:#1a4db7;}
+.s-validacao{background:#f0e6ff;color:#6b2db7;}
+.s-iniciar{background:#fff3e0;color:#b76200;}
+.s-bloqueado{background:#ffe6e6;color:#b71a1a;}
+.s-adiado{background:#f0f0f0;color:#6e6e73;}
+.rdm-add{width:100%;padding:8px 14px;background:#fafafa;border:none;border-top:1px dashed var(--g200);color:var(--g400);font-size:11px;cursor:pointer;text-align:left;font-family:inherit;transition:.15s;}
+.rdm-add:hover{background:#f0f0f0;color:var(--navy);}
+.rdm-del{background:none;border:none;color:var(--g300);cursor:pointer;font-size:13px;padding:0 4px;opacity:0;transition:.15s;}
+.rdm-tbl tr:hover .rdm-del{opacity:1;}
+.rdm-del:hover{color:#c00;}
+</style>
+
+<div class="rdm-top">
+  <div><div class="rdm-title">Roadmap 2026</div><div class="rdm-subtitle">Ocean Talent Solutions · Plano de reestruturação · Clique em qualquer célula para editar</div></div>
+</div>
+<div class="rdm-summary" id="rdm-summary"></div>
+<div class="rdm-toolbar">
+  <span class="rft">Filtrar:</span>
+  <button class="rfb active" data-f="all">Todas</button>
+  <button class="rfb" data-f="Feito">✓ Feito</button>
+  <button class="rfb" data-f="Em andamento">Em andamento</button>
+  <button class="rfb" data-f="Validação">Validação</button>
+  <button class="rfb" data-f="Iniciar">Iniciar</button>
+  <button class="rfb" data-f="Bloqueado">Bloqueado</button>
+  <button class="rfb" data-f="Adiado">Adiado</button>
+  <span class="rdm-saved" id="rdm-saved"></span>
+  <button class="rdm-reset" onclick="rdmReset()">↺ Resetar dados</button>
+</div>
+<div id="rdm-body"></div>
+</div>
+
+<script>
+(function(){
+const SC={'Feito':'s-feito','Em andamento':'s-andamento','Validação':'s-validacao','Iniciar':'s-iniciar','Bloqueado':'s-bloqueado','Adiado':'s-adiado'};
+const SS=['Feito','Em andamento','Validação','Iniciar','Bloqueado','Adiado'];
+const COL={red:'#c0392b',orange:'#e67e22',blue:'#1a4db7',purple:'#6b2db7',gray:'#5a5a5f'};
+
+const DEF=[
+{id:'f0',label:'FASE 0',title:'Estruturação da Parceria',color:'gray',colorL:'#f2f2f7',horizonte:'',tasks:[
+  {id:'f0t1',t:'Organizar acessos',p:'Jun/26',s:'Feito',a:'Tecnologia',r:'Fernando',d:'Planilhas, organograma, diretrizes R&S'},
+  {id:'f0t2',t:'Diagnóstico da operação + Definição de roadmap',p:'Jun/26',s:'Feito',a:'Governança',r:'Leandro, Fábio, Fernando',d:'Dashboard Diagnóstico Ocean'},
+  {id:'f0t3',t:'Organizar comunicação (agenda e pautas)',p:'Jun/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',d:'Seg/Qua/Sex · Pauta Roadmap'},
+  {id:'f0t4',t:'Abrir CNPJ Leandro (Advisory)',p:'Jun/26',s:'Iniciar',a:'Jurídico',r:'Leandro',d:''},
+  {id:'f0t5',t:'Abrir conta PJ',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Leandro',d:'Aguarda CNPJ'},
+  {id:'f0t6',t:'Contrato de serviço com Ocean',p:'Jul/26',s:'Iniciar',a:'Jurídico',r:'Leandro, Fábio',d:''},
+]},
+{id:'okr1',label:'OKR 1',title:'Estruturar papéis, processos e contratos',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
+  {id:'o1t1',t:'Redesenhar organograma e papéis',p:'Jul/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',d:'3 verticais: líder + HH/Recruiter + Assistant'},
+  {id:'o1t2',t:'Revisar e simplificar modelo de remuneração',p:'Jun/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio, Fernando',d:'Substituir NPCB por modelo simples e claro'},
+  {id:'o1t3',t:'Desenhar plano de carreira',p:'Jul/26',s:'Bloqueado',a:'Governança',r:'Leandro, Fábio, Fernando',d:''},
+  {id:'o1t4',t:'Discutir com equipe e comunicar mudanças',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Fábio',d:'Após definição do modelo'},
+  {id:'o1t5',t:'Formalizar contratos com prestadores',p:'Jul/26',s:'Bloqueado',a:'Jurídico',r:'Fernando, Fábio, Leandro',d:'Reelaborar com base no modelo atualizado'},
+  {id:'o1t6',t:'Revisar cadência de reuniões de gestão',p:'Jul/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro, Fernando',d:'Acompanhamento semanal de execução'},
+  {id:'o1t7',t:'Criar sistema de gestão de contratos',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',d:''},
+]},
+{id:'okr2',label:'OKR 2',title:'Distribuir a geração de negócios',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
+  {id:'o2t1',t:'Implementar metas e KPIs comerciais',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Leandro, Fábio',d:'Metas individuais por consultor'},
+  {id:'o2t2',t:'Criar processo estruturado de prospecção',p:'Jul/26',s:'Bloqueado',a:'Comercial',r:'Leandro, Beto',d:'Playbook de BD para o time'},
+  {id:'o2t3',t:'Implantar CRM / pipeline de oportunidades',p:'Jul/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',d:'Maggo ou solução provisória'},
+  {id:'o2t4',t:'Treinar equipe em desenvolvimento de negócios',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Fábio, Leandro',d:'Capacitação de Beto e Raquel'},
+]},
+{id:'okr3',label:'OKR 3',title:'Construir pipeline de talentos',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar · Recorrente',tasks:[
+  {id:'o3t1',t:'Definir segmentos e níveis prioritários',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Raquel, Leandro',d:''},
+  {id:'o3t2',t:'Estruturar banco de candidatos por vertical',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',d:''},
+  {id:'o3t3',t:'Criar processo de atração contínua',p:'Set/26',s:'Bloqueado',a:'Operações',r:'Raquel',d:'Sourcing recorrente sem demanda ativa'},
+  {id:'o3t4',t:'Integrar pipeline ao ATS',p:'Set/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',d:''},
+]},
+{id:'okr4',label:'OKR 4',title:'Otimizar performance financeira',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar',tasks:[
+  {id:'o4t1',t:'Revisar retirada do sócio vs. resultado retido',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio',d:'Retirada R$50K/mês = 47% da folha total'},
+  {id:'o4t2',t:'Mapear margens por tipo de projeto',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fernando',d:''},
+  {id:'o4t3',t:'Calcular custo por placement',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Fernando',d:''},
+  {id:'o4t4',t:'Criar dashboard financeiro mensal',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',d:''},
+]},
+{id:'okr5',label:'OKR 5',title:'Expandir possibilidades de receita',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
+  {id:'o5t1',t:'Estruturar oferta People / CHRO as a Service',p:'Set/26',s:'Bloqueado',a:'Comercial',r:'Fábio, Leandro',d:'Aumentar ticket com clientes existentes'},
+  {id:'o5t2',t:'Mapear oportunidades de BPO/Alocação',p:'Set/26',s:'Bloqueado',a:'Comercial',r:'Fábio, Beto',d:'Alocação de mão de obra fixa ou temporária'},
+  {id:'o5t3',t:'Avaliar parceria para expansão EUA',p:'Out/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',d:'Ativar após operação estruturada'},
+]},
+{id:'okr6',label:'OKR 6',title:'Revisar marca e posicionamento',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
+  {id:'o6t1',t:'Revisar posicionamento e practice areas',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',d:''},
+  {id:'o6t2',t:'Decisão sobre naming (manter "Ocean"?)',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',d:''},
+  {id:'o6t3',t:'Atualizar brand kit e identidade visual',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Parceiro',d:''},
+  {id:'o6t4',t:'Lançar site atualizado (PT + ENG)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',d:''},
+  {id:'o6t5',t:'Criar materiais institucionais',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',d:'LinkedIn, apresentação, proposta comercial'},
+  {id:'o6t6',t:'Geração de autoridade (conteúdo)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Fábio, Leandro',d:'Calendário editorial'},
+]},
+];
+
+let data,filter='all';
+const collapsed={};
+
+function load(){
+  try{const s=localStorage.getItem('ocean_rdm_v3');data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEF));}
+  catch(e){data=JSON.parse(JSON.stringify(DEF));}
+}
+function save(){
+  localStorage.setItem('ocean_rdm_v3',JSON.stringify(data));
+  const el=document.getElementById('rdm-saved');
+  if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2000);}
+}
+window.rdmReset=function(){
+  if(!confirm('Resetar todas as alterações para os dados originais?'))return;
+  localStorage.removeItem('ocean_rdm_v3');
+  data=JSON.parse(JSON.stringify(DEF));
+  render();
+};
+window.rdmStatus=function(gid,tid,sel){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
+  t.s=sel.value;save();updateSummary();updateProg(gid);
+  sel.className='stsel '+(SC[sel.value]||'s-iniciar');
+};
+window.rdmCell=function(gid,tid,field,el){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
+  t[field]=el.textContent.trim();save();
+};
+window.rdmAdd=function(gid){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  g.tasks.push({id:gid+'_'+Date.now(),t:'Nova tarefa',p:'',s:'Iniciar',a:'',r:'',d:''});
+  save();render();
+};
+window.rdmDel=function(gid,tid){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  if(!confirm('Remover esta tarefa?'))return;
+  g.tasks=g.tasks.filter(x=>x.id!==tid);save();render();
+};
+window.rdmToggle=function(gid){
+  collapsed[gid]=!collapsed[gid];
+  const c=document.getElementById('rdm-c-'+gid);
+  const ch=document.getElementById('rdm-ch-'+gid);
+  if(c)c.style.display=collapsed[gid]?'none':'';
+  if(ch)ch.textContent=collapsed[gid]?'▸':'▾';
+};
+
+function stOpts(cur){return SS.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');}
+
+function renderGroup(g){
+  const vis=filter==='all'?g.tasks:g.tasks.filter(t=>t.s===filter);
+  const total=g.tasks.length,done=g.tasks.filter(t=>t.s==='Feito').length;
+  const pct=total?Math.round(done/total*100):0;
+  const c=COL[g.color]||'#888';
+  const rows=vis.map(t=>`<tr>
+    <td style="min-width:24px;width:28px;"><button class="rdm-del" onclick="rdmDel('${g.id}','${t.id}')">✕</button></td>
+    <td style="min-width:200px;" contenteditable="true" data-ph="Tarefa..." onblur="rdmCell('${g.id}','${t.id}','t',this)">${t.t}</td>
+    <td style="min-width:75px;white-space:nowrap;" contenteditable="true" data-ph="Mês/Ano" onblur="rdmCell('${g.id}','${t.id}','p',this)">${t.p}</td>
+    <td style="min-width:130px;"><select class="stsel ${SC[t.s]||'s-iniciar'}" onchange="rdmStatus('${g.id}','${t.id}',this)">${stOpts(t.s)}</select></td>
+    <td style="min-width:90px;" contenteditable="true" data-ph="Área" onblur="rdmCell('${g.id}','${t.id}','a',this)">${t.a}</td>
+    <td style="min-width:140px;" contenteditable="true" data-ph="Responsável" onblur="rdmCell('${g.id}','${t.id}','r',this)">${t.r}</td>
+    <td style="min-width:180px;color:var(--g500);" contenteditable="true" data-ph="Detalhes..." onblur="rdmCell('${g.id}','${t.id}','d',this)">${t.d}</td>
+  </tr>`).join('');
+
+  return `<div class="rdm-group" id="rdm-g-${g.id}">
+    <div class="rdm-gh" onclick="rdmToggle('${g.id}')">
+      <span class="rdm-badge" style="background:${g.colorL};color:${c};">${g.label}</span>
+      <span class="rdm-gtitle">${g.title}</span>
+      ${g.horizonte?`<span class="rdm-horiz">${g.horizonte}</span>`:''}
+      <div class="rdm-gprog">
+        <div class="rdm-gpb"><div class="rdm-gpf" id="rdm-pf-${g.id}" style="width:${pct}%;background:${c};"></div></div>
+        <span class="rdm-gpct" id="rdm-pct-${g.id}">${pct}%</span>
+      </div>
+      <span class="rdm-chev" id="rdm-ch-${g.id}">▾</span>
+    </div>
+    <div id="rdm-c-${g.id}">
+      ${vis.length>0?`<div class="rdm-tbl-wrap"><table class="rdm-tbl">
+        <thead><tr><th></th><th>Tarefa</th><th>Prazo</th><th>Status</th><th>Área</th><th>Responsável</th><th>Detalhes</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`:`<div style="padding:14px 18px;color:var(--g400);font-size:12px;">Nenhuma tarefa neste filtro.</div>`}
+      <button class="rdm-add" onclick="rdmAdd('${g.id}')">+ Adicionar tarefa</button>
+    </div>
+  </div>`;
+}
+
+function updateProg(gid){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const total=g.tasks.length,done=g.tasks.filter(t=>t.s==='Feito').length;
+  const pct=total?Math.round(done/total*100):0;
+  const pf=document.getElementById('rdm-pf-'+gid);
+  const pc=document.getElementById('rdm-pct-'+gid);
+  if(pf)pf.style.width=pct+'%';
+  if(pc)pc.textContent=pct+'%';
+}
+
+function updateSummary(){
+  const all=data.flatMap(g=>g.tasks);
+  const cnt={};SS.forEach(s=>cnt[s]=0);
+  all.forEach(t=>{if(cnt[t.s]!==undefined)cnt[t.s]++;});
+  const total=all.length,done=cnt['Feito'];
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('rdm-summary').innerHTML=`
+    <div class="rsc"><div class="rv">${total}</div><div class="rl">Total</div></div>
+    <div class="rsc"><div class="rv" style="color:#1a7a4a;">${done}</div><div class="rl">Feito</div></div>
+    <div class="rsc"><div class="rv" style="color:#1a4db7;">${cnt['Em andamento']}</div><div class="rl">Em andamento</div></div>
+    <div class="rsc"><div class="rv" style="color:#b76200;">${cnt['Iniciar']}</div><div class="rl">A iniciar</div></div>
+    <div class="rsc"><div class="rv" style="color:#b71a1a;">${cnt['Bloqueado']}</div><div class="rl">Bloqueado</div></div>
+    <div class="rsc rc-prog"><div style="font-size:11px;font-weight:700;color:var(--navy);">${pct}% concluído</div><div class="rdm-prog-bar-outer"><div class="rdm-prog-bar-inner" style="width:${pct}%;"></div></div></div>`;
+}
+
+function render(){
+  document.getElementById('rdm-body').innerHTML=data.map(renderGroup).join('');
+  updateSummary();
+}
+
+document.getElementById('rdm-toolbar').addEventListener('click',function(e){
+  const btn=e.target.closest('.rfb');if(!btn)return;
+  document.querySelectorAll('.rfb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filter=btn.dataset.f;
+  render();
+});
+
+load();render();
+})();
+</script>
 </div>
 
 <footer>Ocean Talent Solutions · Diagnóstico Fase 0 · Junho 2026 · Confidencial</footer>
