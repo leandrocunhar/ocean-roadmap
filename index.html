@@ -971,10 +971,10 @@ td.co-late .rdm-month-sel{color:#b71a1a;font-weight:600;}
 .rdm-resp-display{font-size:11px;color:var(--navy);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .rdm-resp-display.empty{color:var(--g300);font-style:italic;}
 .rdm-resp-arrow{color:var(--g400);font-size:9px;flex-shrink:0;}
-.rdm-resp-dd{position:fixed;background:#fff;border:1px solid var(--g200);border-radius:8px;padding:6px;z-index:9999;min-width:160px;box-shadow:0 4px 16px rgba(0,0,0,.15);display:none;}
-.rdm-resp-dd label{display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:11px;cursor:pointer;border-radius:5px;white-space:nowrap;}
-.rdm-resp-dd label:hover{background:var(--g50);}
-.rdm-resp-dd input[type=checkbox]{cursor:pointer;accent-color:var(--navy);}
+#rdm-resp-overlay{position:fixed;background:#fff;border:1px solid var(--g200);border-radius:8px;padding:6px;z-index:9999;min-width:160px;box-shadow:0 4px 16px rgba(0,0,0,.15);display:none;}
+#rdm-resp-overlay label{display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:11px;cursor:pointer;border-radius:5px;white-space:nowrap;}
+#rdm-resp-overlay label:hover{background:var(--g50);}
+#rdm-resp-overlay input[type=checkbox]{cursor:pointer;accent-color:var(--navy);}
 /* Expand */
 .rdm-exp-btn{background:none;border:none;cursor:pointer;color:var(--g400);font-size:11px;padding:2px 4px;font-family:inherit;display:block;margin:0 auto;}
 .rdm-exp-btn:hover{color:var(--navy);}
@@ -1172,32 +1172,38 @@ window.rdmExpand=function(gid,tid){
   if(row)row.style.display=expanded[key]?'':'none';
   if(btn)btn.textContent=expanded[key]?'▾':'▸';
 };
-// Multi-select responsável
-window.rdmRespToggle=function(e,key){
-  e.stopPropagation();
-  const dd=document.getElementById('rdm-resp-dd-'+key);
-  if(!dd)return;
-  const open=dd.style.display!=='none';
-  document.querySelectorAll('.rdm-resp-dd').forEach(el=>el.style.display='none');
-  if(!open){
-    const r=e.currentTarget.getBoundingClientRect();
-    dd.style.top=(r.bottom+4)+'px';
-    dd.style.left=r.left+'px';
-    dd.style.display='block';
-  }
+// Multi-select responsável — overlay único no body
+let _rKey=null,_rGid=null,_rTid=null;
+(function(){
+  const ov=document.createElement('div');
+  ov.id='rdm-resp-overlay';
+  ov.addEventListener('click',function(e){e.stopPropagation();});
+  document.body.appendChild(ov);
+})();
+window.rdmRespOpen=function(el,gid,tid,key){
+  const ov=document.getElementById('rdm-resp-overlay');if(!ov)return;
+  if(_rKey===key&&ov.style.display!=='none'){ov.style.display='none';_rKey=null;return;}
+  _rKey=key;_rGid=gid;_rTid=tid;
+  const g=data.find(x=>x.id===gid),t=g&&g.tasks.find(x=>x.id===tid);if(!t)return;
+  ov.innerHTML=RESP.map(r=>'<label><input type="checkbox" value="'+r+'" '+(((t.r||'').split(', ').indexOf(r)>-1)?'checked':'')+'>'+' '+r+'</label>').join('');
+  ov.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      const g2=data.find(x=>x.id===_rGid),t2=g2&&g2.tasks.find(x=>x.id===_rTid);if(!t2)return;
+      t2.r=Array.from(ov.querySelectorAll('input:checked')).map(function(i){return i.value;}).join(', ');
+      save();
+      const disp=document.getElementById('rdm-resp-disp-'+_rKey);
+      if(disp){disp.textContent=t2.r||'—';disp.className='rdm-resp-display'+(t2.r?'':' empty');}
+    });
+  });
+  const r=el.getBoundingClientRect();
+  ov.style.top=(r.bottom+4)+'px';
+  ov.style.left=r.left+'px';
+  ov.style.display='block';
 };
-window.rdmRespChange=function(gid,tid,key){
-  const g=data.find(x=>x.id===gid);if(!g)return;
-  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
-  const dd=document.getElementById('rdm-resp-dd-'+key);if(!dd)return;
-  const vals=Array.from(dd.querySelectorAll('input:checked')).map(i=>i.value);
-  t.r=vals.join(', ');save();
-  const disp=document.getElementById('rdm-resp-disp-'+key);
-  if(disp){disp.textContent=t.r||'—';disp.className='rdm-resp-display'+(t.r?'':' empty');}
-};
-document.addEventListener('click',function(e){
-  if(!e.target.closest('.rdm-resp-cell'))
-    document.querySelectorAll('.rdm-resp-dd').forEach(el=>el.style.display='none');
+document.addEventListener('click',function(){
+  const ov=document.getElementById('rdm-resp-overlay');
+  if(ov){ov.style.display='none';}
+  _rKey=null;
 });
 // Drag
 window.rdmDragStart=function(e,gid,idx){
@@ -1240,7 +1246,6 @@ function renderGroup(g){
     const isExp=!!expanded[key];
     const sc=SC[t.s]||'s-iniciar';
     const mc=monthCls(t.p);
-    const respChecks=RESP.map(r=>`<label><input type="checkbox" value="${r}" ${(t.r||'').includes(r)?'checked':''} onchange="rdmRespChange('${g.id}','${t.id}','${key}')"> ${r}</label>`).join('');
     return `<tr class="rdm-data-row" draggable="true"
         ondragstart="rdmDragStart(event,'${g.id}',${globalIdx})"
         ondragend="rdmDragEnd()"
@@ -1254,11 +1259,10 @@ function renderGroup(g){
           onblur="rdmCell('${g.id}','${t.id}','a',this)">${t.a}</td>
       <td><select class="stsel ${sc}" onchange="rdmStatus('${g.id}','${t.id}',this)">${stOpts(t.s)}</select></td>
       <td class="rdm-resp-cell">
-        <div class="rdm-resp-trigger" onclick="rdmRespToggle(event,'${key}')">
+        <div class="rdm-resp-trigger" onclick="rdmRespOpen(this,'${g.id}','${t.id}','${key}')">
           <span class="rdm-resp-display${t.r?'':' empty'}" id="rdm-resp-disp-${key}">${t.r||'—'}</span>
           <span class="rdm-resp-arrow">▾</span>
         </div>
-        <div class="rdm-resp-dd" id="rdm-resp-dd-${key}" onclick="event.stopPropagation()">${respChecks}</div>
       </td>
       <td class="${mc}"><select class="rdm-month-sel" onchange="rdmMonth('${g.id}','${t.id}','p',this)">${monthOpts(t.p)}</select></td>
       <td class="${conclusaoCls(t.co,t.p)}"><select class="rdm-month-sel" onchange="rdmMonth('${g.id}','${t.id}','co',this)">${monthOpts(t.co)}</select></td>
