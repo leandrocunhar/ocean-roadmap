@@ -1180,7 +1180,8 @@ let _rKey=null,_rGid=null,_rTid=null;
   ov.addEventListener('click',function(e){e.stopPropagation();});
   document.body.appendChild(ov);
 })();
-window.rdmRespOpen=function(el,gid,tid,key){
+window.rdmRespOpen=function(e,el,gid,tid,key){
+  e.stopPropagation();
   const ov=document.getElementById('rdm-resp-overlay');if(!ov)return;
   if(_rKey===key&&ov.style.display!=='none'){ov.style.display='none';_rKey=null;return;}
   _rKey=key;_rGid=gid;_rTid=tid;
@@ -1259,7 +1260,7 @@ function renderGroup(g){
           onblur="rdmCell('${g.id}','${t.id}','a',this)">${t.a}</td>
       <td><select class="stsel ${sc}" onchange="rdmStatus('${g.id}','${t.id}',this)">${stOpts(t.s)}</select></td>
       <td class="rdm-resp-cell">
-        <div class="rdm-resp-trigger" onclick="rdmRespOpen(this,'${g.id}','${t.id}','${key}')">
+        <div class="rdm-resp-trigger" onclick="rdmRespOpen(event,this,'${g.id}','${t.id}','${key}')">
           <span class="rdm-resp-display${t.r?'':' empty'}" id="rdm-resp-disp-${key}">${t.r||'—'}</span>
           <span class="rdm-resp-arrow">▾</span>
         </div>
