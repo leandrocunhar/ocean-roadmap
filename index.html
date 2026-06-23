@@ -201,7 +201,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 
 <!-- HERO -->
 <header class="hero">
-  <div class="badge">Fase 0 — Diagnóstico</div>
+
   <h1>Ocean Talent Solutions</h1>
   <p class="hero-sub">Diagnóstico completo da operação atual · Base para reestruturação 2026–2027</p>
   <div class="hero-meta">
@@ -899,7 +899,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 #rdm-wrap{font-family:'Inter',-apple-system,sans-serif;}
 .rdm-top{margin-bottom:16px;}
 .rdm-title{font-size:18px;font-weight:800;color:var(--navy);}
-.rdm-subtitle{font-size:11px;color:var(--g500);margin-top:3px;}
+
 .rdm-summary{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
 .rsc{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:10px 14px;min-width:90px;}
 .rsc .rv{font-size:20px;font-weight:800;color:var(--navy);}
@@ -908,8 +908,8 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 .rdm-pbo{background:var(--g200);height:6px;border-radius:3px;margin-top:6px;overflow:hidden;}
 .rdm-pbi{height:100%;background:#1a7a4a;border-radius:3px;transition:.3s;}
 /* Toolbars */
-.rdm-toolbar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center;}
-.rdm-toolbar2{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+
+
 .rft{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g500);margin-right:4px;white-space:nowrap;}
 .rfb{padding:5px 10px;border:1px solid var(--g200);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--g600);transition:.15s;font-family:inherit;}
 .rfb.active,.rfb:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
@@ -985,32 +985,55 @@ td.co-late .rdm-month-sel{color:#b71a1a;font-weight:600;}
 .rdm-expand-field:focus{border-color:#f5a623;box-shadow:0 0 0 2px #ffefc0;}
 .rdm-add{width:100%;padding:8px 14px;background:#fafafa;border:none;border-top:1px dashed var(--g200);color:var(--g400);font-size:11px;cursor:pointer;text-align:left;font-family:inherit;}
 .rdm-add:hover{background:#f0f0f0;color:var(--navy);}
+
+/* Filter button + dropdown */
+.rdm-filter-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.rdm-filter-btn{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--navy);display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.rdm-filter-btn:hover{background:var(--g50);}
+.rdm-filter-btn.active-filter{background:var(--navy);color:#fff;border-color:var(--navy);}
+.rdm-flt-badge{background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;}
+.rdm-filter-btn.active-filter .rdm-flt-badge{background:rgba(255,255,255,.3);}
+#rdm-filter-dd{position:fixed;background:#fff;border:1px solid var(--g200);border-radius:10px;padding:16px;z-index:9999;min-width:260px;box-shadow:0 6px 24px rgba(0,0,0,.13);display:none;}
+.rdm-flt-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g400);margin-bottom:7px;}
+.rdm-flt-opts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;}
+.rdm-flt-opts:last-child{margin-bottom:0;}
+.rdm-flt-opt{border:1px solid var(--g200);background:#fff;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--navy);}
+.rdm-flt-opt:hover{background:var(--g50);}
+.rdm-flt-opt.active{background:var(--navy);color:#fff;border-color:var(--navy);}
 </style>
 
 <div class="rdm-top">
   <div class="rdm-title">Roadmap 2026</div>
-  <div class="rdm-subtitle">Ocean Talent Solutions · Prazo em <strong>negrito</strong> = mês atual · Conclusão <span style="color:#1a7a4a;font-weight:600;">verde</span> = no prazo · <span style="color:#b71a1a;font-weight:600;">vermelha</span> = fora do prazo</div>
 </div>
 <div class="rdm-summary" id="rdm-summary"></div>
-<div class="rdm-toolbar" id="rdm-toolbar">
-  <span class="rft">Status:</span>
-  <button class="rfb active" data-f="all">Todas</button>
-  <button class="rfb" data-f="Feito">✓ Feito</button>
-  <button class="rfb" data-f="Validar">Validar</button>
-  <button class="rfb" data-f="Em andamento">Em andamento</button>
-  <button class="rfb" data-f="Iniciar">Iniciar</button>
-  <button class="rfb" data-f="Bloqueado">Bloqueado</button>
-  <button class="rfb" data-f="Adiado">Adiado</button>
+<div class="rdm-filter-row">
+  <div style="position:relative;">
+    <button class="rdm-filter-btn" id="rdm-filter-btn" onclick="rdmFilterToggle(event,this)">
+      Filtros <span class="rdm-flt-badge" id="rdm-flt-badge" style="display:none"></span> <span style="opacity:.5;font-size:10px;">▾</span>
+    </button>
+    <div id="rdm-filter-dd" onclick="event.stopPropagation()">
+      <div class="rdm-flt-section">Status</div>
+      <div class="rdm-flt-opts" id="rdm-flt-status">
+        <button class="rdm-flt-opt active" data-f="all" onclick="rdmFltStatus(this,'all')">Todas</button>
+        <button class="rdm-flt-opt" data-f="Feito" onclick="rdmFltStatus(this,'Feito')">✓ Feito</button>
+        <button class="rdm-flt-opt" data-f="Validar" onclick="rdmFltStatus(this,'Validar')">Validar</button>
+        <button class="rdm-flt-opt" data-f="Em andamento" onclick="rdmFltStatus(this,'Em andamento')">Em andamento</button>
+        <button class="rdm-flt-opt" data-f="Iniciar" onclick="rdmFltStatus(this,'Iniciar')">Iniciar</button>
+        <button class="rdm-flt-opt" data-f="Bloqueado" onclick="rdmFltStatus(this,'Bloqueado')">Bloqueado</button>
+        <button class="rdm-flt-opt" data-f="Adiado" onclick="rdmFltStatus(this,'Adiado')">Adiado</button>
+      </div>
+      <div class="rdm-flt-section">Responsável</div>
+      <div class="rdm-flt-opts">
+        <button class="rdm-flt-opt active" data-r="all" onclick="rdmFltResp(this,'all')">Todos</button>
+        <button class="rdm-flt-opt" data-r="Leandro" onclick="rdmFltResp(this,'Leandro')">Leandro</button>
+        <button class="rdm-flt-opt" data-r="Fábio" onclick="rdmFltResp(this,'Fábio')">Fábio</button>
+        <button class="rdm-flt-opt" data-r="Fernando" onclick="rdmFltResp(this,'Fernando')">Fernando</button>
+        <button class="rdm-flt-opt" data-r="Especialista" onclick="rdmFltResp(this,'Especialista')">Especialista</button>
+        <button class="rdm-flt-opt" data-r="IA" onclick="rdmFltResp(this,'IA')">IA</button>
+      </div>
+    </div>
+  </div>
   <span class="rdm-saved" id="rdm-saved"></span>
-</div>
-<div class="rdm-toolbar2" id="rdm-toolbar-resp">
-  <span class="rft">Responsável:</span>
-  <button class="rfb2 active" data-r="all">Todos</button>
-  <button class="rfb2" data-r="Leandro">Leandro</button>
-  <button class="rfb2" data-r="Fábio">Fábio</button>
-  <button class="rfb2" data-r="Fernando">Fernando</button>
-  <button class="rfb2" data-r="Especialista">Especialista</button>
-  <button class="rfb2" data-r="IA">IA</button>
 </div>
 <div id="rdm-body"></div>
 </div>
@@ -1334,21 +1357,34 @@ function render(){
   updateSummary();
 }
 
-// Status filter
-document.getElementById('rdm-toolbar').addEventListener('click',function(e){
-  const btn=e.target.closest('.rfb');if(!btn)return;
-  document.querySelectorAll('#rdm-toolbar .rfb').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');filterStatus=btn.dataset.f;render();
+// Filter dropdown
+function rdmFltUpdateBadge(){
+  const active=(filterStatus!=='all'?1:0)+(filterResp!=='all'?1:0);
+  const badge=document.getElementById('rdm-flt-badge');
+  const btn=document.getElementById('rdm-filter-btn');
+  if(badge){badge.textContent=active;badge.style.display=active?'':'none';}
+  if(btn)btn.classList.toggle('active-filter',active>0);
+}
+window.rdmFltStatus=function(el,val){
+  document.querySelectorAll('#rdm-flt-status .rdm-flt-opt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');filterStatus=val;render();rdmFltUpdateBadge();
+};
+window.rdmFltResp=function(el,val){
+  el.closest('.rdm-flt-opts').querySelectorAll('.rdm-flt-opt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');filterResp=val;render();rdmFltUpdateBadge();
+};
+window.rdmFilterToggle=function(e,btn){
+  e.stopPropagation();
+  const dd=document.getElementById('rdm-filter-dd');if(!dd)return;
+  const open=dd.style.display!=='none';
+  dd.style.display='none';
+  if(!open){const r=btn.getBoundingClientRect();dd.style.top=(r.bottom+4)+'px';dd.style.left=r.left+'px';dd.style.display='block';}
+};
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#rdm-filter-btn')&&!e.target.closest('#rdm-filter-dd')){
+    const dd=document.getElementById('rdm-filter-dd');if(dd)dd.style.display='none';
+  }
 });
-// Resp filter (using rfb2 class)
-document.getElementById('rdm-toolbar-resp').addEventListener('click',function(e){
-  const btn=e.target.closest('.rfb2');if(!btn)return;
-  document.querySelectorAll('.rfb2').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');filterResp=btn.dataset.r;render();
-});
-
-// Apply rfb styles to rfb2
-document.querySelectorAll('.rfb2').forEach(b=>b.classList.add('rfb'));
 
 load();render();
 })();
