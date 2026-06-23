@@ -912,8 +912,6 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 .rfb{padding:5px 10px;border:1px solid var(--g200);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--g600);transition:.15s;font-family:inherit;}
 .rfb.active,.rfb:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
 .rdm-saved{font-size:10px;color:var(--g400);margin-left:auto;}
-.rdm-reset{padding:5px 11px;font-size:11px;border:1px solid var(--g200);border-radius:6px;background:#fff;color:var(--g600);cursor:pointer;font-family:inherit;}
-.rdm-reset:hover{border-color:#c00;color:#c00;}
 /* Groups */
 .rdm-group{margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid var(--g200);}
 .rdm-gh{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none;background:#fff;}
@@ -926,49 +924,56 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 .rdm-gpf{height:100%;border-radius:2px;transition:.4s;}
 .rdm-gpct{font-size:10px;font-weight:700;color:var(--g500);min-width:26px;text-align:right;}
 .rdm-chev{color:var(--g400);font-size:12px;margin-left:4px;}
-/* Table - fixed layout */
+/* Table */
 .rdm-tbl-wrap{overflow-x:auto;}
 .rdm-tbl{width:100%;border-collapse:collapse;background:#fff;table-layout:fixed;}
-.rdm-tbl colgroup col:nth-child(1){width:30px;}
+.rdm-tbl colgroup col:nth-child(1){width:28px;}
 .rdm-tbl colgroup col:nth-child(2){width:28px;}
-.rdm-tbl colgroup col:nth-child(3){width:220px;}
-.rdm-tbl colgroup col:nth-child(4){width:72px;}
-.rdm-tbl colgroup col:nth-child(5){width:132px;}
-.rdm-tbl colgroup col:nth-child(6){width:92px;}
-.rdm-tbl colgroup col:nth-child(7){width:148px;}
-.rdm-tbl colgroup col:nth-child(8){width:32px;}
+.rdm-tbl colgroup col:nth-child(3){width:210px;}
+.rdm-tbl colgroup col:nth-child(4){width:88px;}
+.rdm-tbl colgroup col:nth-child(5){width:118px;}
+.rdm-tbl colgroup col:nth-child(6){width:148px;}
+.rdm-tbl colgroup col:nth-child(7){width:96px;}
+.rdm-tbl colgroup col:nth-child(8){width:96px;}
+.rdm-tbl colgroup col:nth-child(9){width:28px;}
 .rdm-tbl th{background:var(--g50);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g500);padding:7px 10px;text-align:left;border-bottom:1px solid var(--g200);overflow:hidden;white-space:nowrap;}
-.rdm-tbl td{padding:7px 10px;font-size:12px;color:var(--navy);border-bottom:1px solid #f0f0f2;vertical-align:middle;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-.rdm-tbl tr.rdm-data-row:last-of-type td,.rdm-tbl tr.rdm-expand-row:last-of-type td{border-bottom:none;}
+.rdm-tbl td{padding:6px 10px;font-size:12px;color:var(--navy);border-bottom:1px solid #f0f0f2;vertical-align:middle;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .rdm-tbl tr.rdm-data-row:hover td{background:#fafafa;}
 .rdm-tbl td[contenteditable]{outline:none;cursor:text;}
 .rdm-tbl td[contenteditable]:focus{background:#fffbea;box-shadow:inset 0 0 0 1.5px #f5a623;white-space:normal;overflow:visible;text-overflow:clip;}
 .rdm-tbl td.ce-empty:not(:focus):before{content:attr(data-ph);color:var(--g300);font-style:italic;}
-/* Drag handle */
-.rdm-drag{cursor:grab;color:var(--g300);font-size:14px;padding:2px 4px;line-height:1;user-select:none;display:block;text-align:center;}
+/* Drag */
+.rdm-drag{cursor:grab;color:var(--g300);font-size:14px;user-select:none;display:block;text-align:center;}
 .rdm-drag:hover{color:var(--g500);}
 .rdm-tbl tr.drag-over td{background:#e8f0ff;}
-/* Del button */
-.rdm-del{background:none;border:none;color:var(--g300);cursor:pointer;font-size:12px;padding:1px 3px;opacity:0;transition:.15s;display:block;margin:0 auto;}
+/* Del */
+.rdm-del{background:none;border:none;color:var(--g300);cursor:pointer;font-size:12px;padding:1px 3px;opacity:0;display:block;margin:0 auto;}
 .rdm-tbl tr:hover .rdm-del{opacity:1;}
 .rdm-del:hover{color:#c00;}
-/* Status select */
+/* Status */
 .stsel{border:none;font-size:11px;font-weight:700;cursor:pointer;padding:3px 6px;border-radius:4px;outline:none;appearance:none;-webkit-appearance:none;font-family:inherit;width:100%;}
 .s-feito{background:#e6f9ef;color:#1a7a4a;}
 .s-andamento{background:#fffbe6;color:#8a6800;}
-.s-validacao{background:#e6f0ff;color:#1a4db7;}
+.s-validar{background:#e6f0ff;color:#1a4db7;}
 .s-iniciar{background:#ffe6e6;color:#b71a1a;}
 .s-bloqueado{background:#f0e6ff;color:#6b2db7;}
 .s-adiado{background:#f0f0f0;color:#6e6e73;}
-/* Expand toggle */
+/* Date inputs */
+.rdm-date-input{border:none;background:transparent;font-size:11px;font-family:inherit;color:inherit;font-weight:inherit;cursor:pointer;width:100%;padding:0;outline:none;box-sizing:border-box;}
+.rdm-date-input::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer;font-size:10px;margin:0;padding:0;}
+.rdm-date-input:focus{background:none;}
+/* Deadline colors */
+td.prazo-vencido{color:#b71a1a!important;font-weight:700!important;}
+td.prazo-vencido .rdm-date-input{color:#b71a1a;font-weight:700;}
+td.prazo-urgente{color:#b76200!important;font-weight:700!important;}
+td.prazo-urgente .rdm-date-input{color:#b76200;font-weight:700;}
+/* Expand */
 .rdm-exp-btn{background:none;border:none;cursor:pointer;color:var(--g400);font-size:11px;padding:2px 4px;font-family:inherit;display:block;margin:0 auto;transition:.15s;}
 .rdm-exp-btn:hover{color:var(--navy);}
-/* Expand detail row */
-.rdm-expand-row td{background:#f7f7fa;padding:0;border-bottom:1px solid var(--g200);}
-.rdm-expand-inner{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;padding:14px 16px;gap:16px;}
-.rdm-expand-section{}
+.rdm-expand-row td{background:#f7f7fa;padding:0;}
+.rdm-expand-inner{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 16px;}
 .rdm-expand-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--g500);margin-bottom:5px;}
-.rdm-expand-field{width:100%;min-height:60px;border:1px solid var(--g200);border-radius:6px;padding:8px 10px;font-size:11px;font-family:inherit;color:var(--navy);background:#fff;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;}
+.rdm-expand-field{width:100%;min-height:64px;border:1px solid var(--g200);border-radius:6px;padding:8px 10px;font-size:11px;font-family:inherit;color:var(--navy);background:#fff;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;}
 .rdm-expand-field:focus{border-color:#f5a623;box-shadow:0 0 0 2px #ffefc0;}
 /* Add row */
 .rdm-add{width:100%;padding:8px 14px;background:#fafafa;border:none;border-top:1px dashed var(--g200);color:var(--g400);font-size:11px;cursor:pointer;text-align:left;font-family:inherit;transition:.15s;}
@@ -977,7 +982,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 
 <div class="rdm-top">
   <div class="rdm-title">Roadmap 2026</div>
-  <div class="rdm-subtitle">Ocean Talent Solutions · Clique em qualquer célula para editar · ▸ para ver detalhes · ≡ para reordenar</div>
+  <div class="rdm-subtitle">Ocean Talent Solutions · Clique em qualquer célula para editar · ▸ para detalhes · ⠿ para reordenar · <span style="color:#b71a1a;font-weight:700;">Vermelho</span> = vencido · <span style="color:#b76200;font-weight:700;">Laranja</span> = ≤7 dias</div>
 </div>
 <div class="rdm-summary" id="rdm-summary"></div>
 <div class="rdm-toolbar" id="rdm-toolbar">
@@ -996,80 +1001,89 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
 
 <script>
 (function(){
-const SC={'Feito':'s-feito','Em andamento':'s-andamento','Validar':'s-validacao','Iniciar':'s-iniciar','Bloqueado':'s-bloqueado','Adiado':'s-adiado'};
+const SC={'Feito':'s-feito','Em andamento':'s-andamento','Validar':'s-validar','Iniciar':'s-iniciar','Bloqueado':'s-bloqueado','Adiado':'s-adiado'};
 const SS=['Feito','Validar','Em andamento','Iniciar','Bloqueado','Adiado'];
 const COL={red:'#c0392b',orange:'#e67e22',blue:'#1a4db7',gray:'#5a5a5f'};
 
 const DEF=[
 {id:'f0',label:'FASE 0',title:'Estruturação da Parceria',color:'gray',colorL:'#f2f2f7',horizonte:'',tasks:[
-  {id:'f0t1',t:'Organizar acessos',p:'Jun/26',s:'Feito',a:'Tecnologia',r:'Fernando',c:'1. Solicitar acesso às planilhas\n2. Organizar documentos no Drive\n3. Compartilhar diretrizes de R&S',re:'Planilha de controle, organograma e diretrizes R&S disponíveis',co:'19/06/26'},
-  {id:'f0t2',t:'Diagnóstico da operação + Definição de roadmap',p:'Jun/26',s:'Feito',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Levantar dados financeiros e operacionais\n2. Entrevistar Fábio e Fernando\n3. Construir dashboard\n4. Validar diagnóstico',re:'Dashboard Diagnóstico Ocean validado por Fábio e Fernando',co:'22/06/26'},
-  {id:'f0t3',t:'Organizar comunicação (agenda e pautas)',p:'Jun/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir cadência de reuniões (Seg/Qua/Sex)\n2. Criar template de pauta\n3. Definir canal oficial (WhatsApp, e-mail)',re:'Agenda semanal ativa com pauta padrão',co:''},
-  {id:'f0t4',t:'Abrir CNPJ Leandro (Advisory)',p:'Jun/26',s:'Iniciar',a:'Jurídico',r:'Leandro',c:'1. Definir natureza jurídica (MEI/SLU)\n2. Registrar na Receita Federal\n3. Obter alvará municipal',re:'CNPJ ativo da Advisory',co:''},
-  {id:'f0t5',t:'Abrir conta PJ',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Leandro',c:'1. Aguardar CNPJ\n2. Comparar bancos digitais (Nubank/Inter)\n3. Abrir conta e ativar',re:'Conta PJ ativa para receber honorários',co:''},
-  {id:'f0t6',t:'Contrato de serviço com Ocean',p:'Jul/26',s:'Iniciar',a:'Jurídico',r:'Leandro, Fábio',c:'1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar',re:'Contrato assinado entre Advisory e Ocean',co:''},
+  {id:'f0t1',t:'Organizar acessos',p:'2026-06-30',s:'Feito',a:'Tecnologia',r:'Fernando',c:'1. Solicitar acesso às planilhas\n2. Organizar documentos no Drive\n3. Compartilhar diretrizes de R&S',re:'Planilha de controle, organograma e diretrizes R&S disponíveis',co:'2026-06-19'},
+  {id:'f0t2',t:'Diagnóstico da operação + Definição de roadmap',p:'2026-06-30',s:'Feito',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Levantar dados financeiros e operacionais\n2. Entrevistar Fábio e Fernando\n3. Construir dashboard\n4. Validar diagnóstico',re:'Dashboard Diagnóstico Ocean validado por Fábio e Fernando',co:'2026-06-22'},
+  {id:'f0t3',t:'Organizar comunicação (agenda e pautas)',p:'2026-06-30',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir cadência de reuniões (Seg/Qua/Sex)\n2. Criar template de pauta\n3. Definir canal oficial (WhatsApp, e-mail)',re:'Agenda semanal ativa com pauta padrão',co:''},
+  {id:'f0t4',t:'Abrir CNPJ Leandro (Advisory)',p:'2026-06-30',s:'Iniciar',a:'Jurídico',r:'Leandro',c:'1. Definir natureza jurídica (MEI/SLU)\n2. Registrar na Receita Federal\n3. Obter alvará municipal',re:'CNPJ ativo da Advisory',co:''},
+  {id:'f0t5',t:'Abrir conta PJ',p:'2026-07-31',s:'Bloqueado',a:'Financeiro',r:'Leandro',c:'1. Aguardar CNPJ\n2. Comparar bancos digitais (Nubank/Inter)\n3. Abrir conta e ativar',re:'Conta PJ ativa para receber honorários',co:''},
+  {id:'f0t6',t:'Contrato de serviço com Ocean',p:'2026-07-31',s:'Iniciar',a:'Jurídico',r:'Leandro, Fábio',c:'1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar',re:'Contrato assinado entre Advisory e Ocean',co:''},
 ]},
 {id:'okr1',label:'OKR 1',title:'Estruturar papéis, processos e contratos',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
-  {id:'o1t1',t:'Redesenhar organograma e papéis',p:'Jul/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Mapear funções atuais\n2. Desenhar 3 verticais (líderes + HH/Recruiter + Assistant)\n3. Definir responsabilidades por papel\n4. Validar com Fábio e Fernando',re:'Organograma aprovado com papéis e responsabilidades claras',co:''},
-  {id:'o1t2',t:'Revisar e simplificar modelo de remuneração',p:'Jun/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio, Fernando',c:'1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time',re:'Novo modelo simples, justo e compreensível por todos',co:''},
-  {id:'o1t3',t:'Desenhar plano de carreira',p:'Jul/26',s:'Bloqueado',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração',re:'Plano de carreira documentado e apresentado ao time',co:''},
-  {id:'o1t4',t:'Discutir com equipe e comunicar mudanças',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Fábio',c:'1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar',re:'Time alinhado e comprometido com as mudanças',co:''},
-  {id:'o1t5',t:'Formalizar contratos com prestadores',p:'Jul/26',s:'Bloqueado',a:'Jurídico',r:'Fernando, Fábio, Leandro',c:'1. Listar todos os prestadores ativos\n2. Revisar modelo de contrato\n3. Adaptar para cada perfil\n4. Assinar',re:'100% dos prestadores com contrato assinado',co:''},
-  {id:'o1t6',t:'Revisar cadência de reuniões de gestão',p:'Jul/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro, Fernando',c:'1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta por reunião\n3. Implementar',re:'Reuniões de gestão ativas com pauta e ata',co:''},
-  {id:'o1t7',t:'Criar sistema de gestão de contratos',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Mapear necessidades\n2. Avaliar Maggo vs planilha\n3. Configurar e treinar time',re:'Sistema ativo com todos os contratos cadastrados',co:''},
+  {id:'o1t1',t:'Redesenhar organograma e papéis',p:'2026-07-31',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Mapear funções atuais\n2. Desenhar 3 verticais (líderes + HH/Recruiter + Assistant)\n3. Definir responsabilidades por papel\n4. Validar com Fábio e Fernando',re:'Organograma aprovado com papéis e responsabilidades claras',co:''},
+  {id:'o1t2',t:'Revisar e simplificar modelo de remuneração',p:'2026-06-30',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio, Fernando',c:'1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time',re:'Novo modelo simples, justo e compreensível por todos',co:''},
+  {id:'o1t3',t:'Desenhar plano de carreira',p:'2026-07-31',s:'Bloqueado',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração',re:'Plano de carreira documentado e apresentado ao time',co:''},
+  {id:'o1t4',t:'Discutir com equipe e comunicar mudanças',p:'2026-07-31',s:'Bloqueado',a:'Operações',r:'Fábio',c:'1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar',re:'Time alinhado e comprometido com as mudanças',co:''},
+  {id:'o1t5',t:'Formalizar contratos com prestadores',p:'2026-07-31',s:'Bloqueado',a:'Jurídico',r:'Fernando, Fábio, Leandro',c:'1. Listar todos os prestadores ativos\n2. Revisar modelo de contrato\n3. Adaptar para cada perfil\n4. Assinar',re:'100% dos prestadores com contrato assinado',co:''},
+  {id:'o1t6',t:'Revisar cadência de reuniões de gestão',p:'2026-07-31',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro, Fernando',c:'1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta por reunião\n3. Implementar',re:'Reuniões de gestão ativas com pauta e ata',co:''},
+  {id:'o1t7',t:'Criar sistema de gestão de contratos',p:'2026-08-31',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Mapear necessidades\n2. Avaliar Maggo vs planilha\n3. Configurar e treinar time',re:'Sistema ativo com todos os contratos cadastrados',co:''},
 ]},
 {id:'okr2',label:'OKR 2',title:'Distribuir a geração de negócios',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
-  {id:'o2t1',t:'Implementar metas e KPIs comerciais',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Leandro, Fábio',c:'1. Definir KPIs por papel (contatos, reuniões, propostas)\n2. Criar dashboard de acompanhamento\n3. Revisar semanalmente',re:'KPIs definidos e monitorados por toda a equipe',co:''},
-  {id:'o2t2',t:'Criar processo estruturado de prospecção',p:'Jul/26',s:'Bloqueado',a:'Comercial',r:'Leandro, Beto',c:'1. Mapear mercado-alvo (segmentos/porte)\n2. Criar playbook de BD com scripts\n3. Treinar Beto e Raquel\n4. Lançar primeiro ciclo',re:'Playbook ativo com time fazendo prospecção autônoma',co:''},
-  {id:'o2t3',t:'Implantar CRM / pipeline de oportunidades',p:'Jul/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Avaliar Maggo vs solução provisória\n2. Configurar pipeline (stages)\n3. Migrar oportunidades existentes\n4. Treinar time',re:'100% das oportunidades registradas no CRM',co:''},
-  {id:'o2t4',t:'Treinar equipe em desenvolvimento de negócios',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Fábio, Leandro',c:'1. Mapear gaps de cada pessoa\n2. Criar programa de treino (3-4 sessões)\n3. Acompanhar por 30 dias',re:'Beto e Raquel com autonomia em BD básico',co:''},
+  {id:'o2t1',t:'Implementar metas e KPIs comerciais',p:'2026-07-31',s:'Bloqueado',a:'Operações',r:'Leandro, Fábio',c:'1. Definir KPIs por papel (contatos, reuniões, propostas)\n2. Criar dashboard de acompanhamento\n3. Revisar semanalmente',re:'KPIs definidos e monitorados por toda a equipe',co:''},
+  {id:'o2t2',t:'Criar processo estruturado de prospecção',p:'2026-07-31',s:'Bloqueado',a:'Comercial',r:'Leandro, Beto',c:'1. Mapear mercado-alvo (segmentos/porte)\n2. Criar playbook de BD com scripts\n3. Treinar Beto e Raquel\n4. Lançar primeiro ciclo',re:'Playbook ativo com time fazendo prospecção autônoma',co:''},
+  {id:'o2t3',t:'Implantar CRM / pipeline de oportunidades',p:'2026-07-31',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Avaliar Maggo vs solução provisória\n2. Configurar pipeline (stages)\n3. Migrar oportunidades existentes\n4. Treinar time',re:'100% das oportunidades registradas no CRM',co:''},
+  {id:'o2t4',t:'Treinar equipe em desenvolvimento de negócios',p:'2026-08-31',s:'Bloqueado',a:'Operações',r:'Fábio, Leandro',c:'1. Mapear gaps de cada pessoa\n2. Criar programa de treino (3-4 sessões)\n3. Acompanhar por 30 dias',re:'Beto e Raquel com autonomia em BD básico',co:''},
 ]},
 {id:'okr3',label:'OKR 3',title:'Construir pipeline de talentos',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar · Recorrente',tasks:[
-  {id:'o3t1',t:'Definir segmentos e níveis prioritários',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Raquel, Leandro',c:'1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos',re:'Lista de segmentos/níveis prioritários definida',co:''},
-  {id:'o3t2',t:'Estruturar banco de candidatos por vertical',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Definir campos e critérios\n2. Configurar no ATS\n3. Importar base existente',re:'ATS com banco estruturado e candidatos ativos',co:''},
-  {id:'o3t3',t:'Criar processo de atração contínua',p:'Set/26',s:'Bloqueado',a:'Operações',r:'Raquel',c:'1. Definir cadência de sourcing semanal\n2. Criar scripts de abordagem\n3. Meta: X novos candidatos/semana',re:'Processo recorrente ativo sem depender de demanda',co:''},
-  {id:'o3t4',t:'Integrar pipeline ao ATS',p:'Set/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Mapear fluxo candidato → vaga\n2. Configurar automações básicas\n3. Testar e ajustar',re:'Pipeline de talentos integrado ao ATS operacional',co:''},
+  {id:'o3t1',t:'Definir segmentos e níveis prioritários',p:'2026-08-31',s:'Bloqueado',a:'Operações',r:'Raquel, Leandro',c:'1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos',re:'Lista de segmentos/níveis prioritários definida',co:''},
+  {id:'o3t2',t:'Estruturar banco de candidatos por vertical',p:'2026-08-31',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Definir campos e critérios\n2. Configurar no ATS\n3. Importar base existente',re:'ATS com banco estruturado e candidatos ativos',co:''},
+  {id:'o3t3',t:'Criar processo de atração contínua',p:'2026-09-30',s:'Bloqueado',a:'Operações',r:'Raquel',c:'1. Definir cadência de sourcing semanal\n2. Criar scripts de abordagem\n3. Meta: X novos candidatos/semana',re:'Processo recorrente ativo sem depender de demanda',co:''},
+  {id:'o3t4',t:'Integrar pipeline ao ATS',p:'2026-09-30',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Mapear fluxo candidato → vaga\n2. Configurar automações básicas\n3. Testar e ajustar',re:'Pipeline de talentos integrado ao ATS operacional',co:''},
 ]},
 {id:'okr4',label:'OKR 4',title:'Otimizar performance financeira',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar',tasks:[
-  {id:'o4t1',t:'Revisar retirada do sócio vs. resultado retido',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio',c:'1. Apresentar cenário atual (R$50K = 47% folha)\n2. Modelar cenários alternativos\n3. Definir modelo sustentável com Fábio',re:'Retirada ajustada preservando resultado retido',co:''},
-  {id:'o4t2',t:'Mapear margens por tipo de projeto',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fernando',c:'1. Levantar receita e custo por mandato\n2. Calcular margem por tipo (hunting, RPO, people)\n3. Identificar produtos mais rentáveis',re:'Margem por produto documentada e comparada',co:''},
-  {id:'o4t3',t:'Calcular custo por placement',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Fernando',c:'1. Levantar horas por mandato\n2. Alocar custos fixos\n3. Calcular custo médio por posição preenchida',re:'Custo por placement calculado e documentado',co:''},
-  {id:'o4t4',t:'Criar dashboard financeiro mensal',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Definir KPIs financeiros\n2. Criar planilha/dashboard\n3. Apresentar mensalmente a Fábio',re:'Dashboard mensal ativo com principais indicadores',co:''},
+  {id:'o4t1',t:'Revisar retirada do sócio vs. resultado retido',p:'2026-07-31',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio',c:'1. Apresentar cenário atual (R$50K = 47% folha)\n2. Modelar cenários alternativos\n3. Definir modelo sustentável com Fábio',re:'Retirada ajustada preservando resultado retido',co:''},
+  {id:'o4t2',t:'Mapear margens por tipo de projeto',p:'2026-07-31',s:'Iniciar',a:'Financeiro',r:'Leandro, Fernando',c:'1. Levantar receita e custo por mandato\n2. Calcular margem por tipo (hunting, RPO, people)\n3. Identificar produtos mais rentáveis',re:'Margem por produto documentada e comparada',co:''},
+  {id:'o4t3',t:'Calcular custo por placement',p:'2026-07-31',s:'Bloqueado',a:'Financeiro',r:'Fernando',c:'1. Levantar horas por mandato\n2. Alocar custos fixos\n3. Calcular custo médio por posição preenchida',re:'Custo por placement calculado e documentado',co:''},
+  {id:'o4t4',t:'Criar dashboard financeiro mensal',p:'2026-08-31',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Definir KPIs financeiros\n2. Criar planilha/dashboard\n3. Apresentar mensalmente a Fábio',re:'Dashboard mensal ativo com principais indicadores',co:''},
 ]},
 {id:'okr5',label:'OKR 5',title:'Expandir possibilidades de receita',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
-  {id:'o5t1',t:'Estruturar oferta People / CHRO as a Service',p:'Set/26',s:'Bloqueado',a:'Comercial',r:'Fábio, Leandro',c:'1. Definir escopo do produto\n2. Precificar (mensal/projeto)\n3. Criar proposta comercial\n4. Testar com 1-2 clientes existentes',re:'Produto CHRO as a Service precificado e proposta criada',co:''},
-  {id:'o5t2',t:'Mapear oportunidades de BPO/Alocação',p:'Set/26',s:'Bloqueado',a:'Comercial',r:'Fábio, Beto',c:'1. Mapear clientes com demanda de alocação\n2. Definir modelo operacional e comercial\n3. Fazer 3 reuniões comerciais',re:'Primeira oportunidade de BPO identificada e proposta enviada',co:''},
-  {id:'o5t3',t:'Avaliar parceria para expansão EUA',p:'Out/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Mapear parceiros potenciais nos EUA\n2. Avaliar modelo de comissão\n3. Fazer reunião de alinhamento',re:'Parceria definida ou descartada formalmente',co:''},
+  {id:'o5t1',t:'Estruturar oferta People / CHRO as a Service',p:'2026-09-30',s:'Bloqueado',a:'Comercial',r:'Fábio, Leandro',c:'1. Definir escopo do produto\n2. Precificar (mensal/projeto)\n3. Criar proposta comercial\n4. Testar com 1-2 clientes existentes',re:'Produto CHRO as a Service precificado e proposta criada',co:''},
+  {id:'o5t2',t:'Mapear oportunidades de BPO/Alocação',p:'2026-09-30',s:'Bloqueado',a:'Comercial',r:'Fábio, Beto',c:'1. Mapear clientes com demanda de alocação\n2. Definir modelo operacional e comercial\n3. Fazer 3 reuniões comerciais',re:'Primeira oportunidade de BPO identificada e proposta enviada',co:''},
+  {id:'o5t3',t:'Avaliar parceria para expansão EUA',p:'2026-10-31',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Mapear parceiros potenciais nos EUA\n2. Avaliar modelo de comissão\n3. Fazer reunião de alinhamento',re:'Parceria definida ou descartada formalmente',co:''},
 ]},
 {id:'okr6',label:'OKR 6',title:'Revisar marca e posicionamento',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
-  {id:'o6t1',t:'Revisar posicionamento e practice areas',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Workshop de posicionamento (2h)\n2. Definir 3-4 practice areas\n3. Criar mensagem central',re:'Posicionamento e practice areas definidos e documentados',co:''},
-  {id:'o6t2',t:'Decisão sobre naming (manter "Ocean"?)',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Avaliar força da marca atual\n2. Pesquisar alternativas\n3. Decisão formal',re:'Decisão sobre o nome registrada e comunicada',co:''},
-  {id:'o6t3',t:'Atualizar brand kit e identidade visual',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Parceiro',c:'1. Briefing para designer\n2. Revisar logo, paleta, tipografia\n3. Aprovar e exportar arquivos',re:'Brand kit atualizado e distribuído ao time',co:''},
-  {id:'o6t4',t:'Lançar site atualizado (PT + ENG)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. Definir estrutura e textos\n2. Desenvolver com parceiro\n3. Publicar e testar',re:'Site no ar em PT e ENG com novo posicionamento',co:''},
-  {id:'o6t5',t:'Criar materiais institucionais',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. LinkedIn (banners, posts)\n2. Apresentação institucional\n3. Proposta comercial padrão',re:'Kit de materiais pronto para uso comercial',co:''},
-  {id:'o6t6',t:'Geração de autoridade (conteúdo)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Fábio, Leandro',c:'1. Definir temas prioritários\n2. Criar calendário editorial\n3. Publicar 2-3 posts/semana',re:'Calendário editorial ativo com primeiros 30 dias programados',co:''},
+  {id:'o6t1',t:'Revisar posicionamento e practice areas',p:'2026-09-30',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Workshop de posicionamento (2h)\n2. Definir 3-4 practice areas\n3. Criar mensagem central',re:'Posicionamento e practice areas definidos e documentados',co:''},
+  {id:'o6t2',t:'Decisão sobre naming (manter "Ocean"?)',p:'2026-09-30',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Avaliar força da marca atual\n2. Pesquisar alternativas\n3. Decisão formal',re:'Decisão sobre o nome registrada e comunicada',co:''},
+  {id:'o6t3',t:'Atualizar brand kit e identidade visual',p:'2026-09-30',s:'Bloqueado',a:'Marketing',r:'Leandro, Parceiro',c:'1. Briefing para designer\n2. Revisar logo, paleta, tipografia\n3. Aprovar e exportar arquivos',re:'Brand kit atualizado e distribuído ao time',co:''},
+  {id:'o6t4',t:'Lançar site atualizado (PT + ENG)',p:'2026-10-31',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. Definir estrutura e textos\n2. Desenvolver com parceiro\n3. Publicar e testar',re:'Site no ar em PT e ENG com novo posicionamento',co:''},
+  {id:'o6t5',t:'Criar materiais institucionais',p:'2026-09-30',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. LinkedIn (banners, posts)\n2. Apresentação institucional\n3. Proposta comercial padrão',re:'Kit de materiais pronto para uso comercial',co:''},
+  {id:'o6t6',t:'Geração de autoridade (conteúdo)',p:'2026-10-31',s:'Bloqueado',a:'Marketing',r:'Fábio, Leandro',c:'1. Definir temas prioritários\n2. Criar calendário editorial\n3. Publicar 2-3 posts/semana',re:'Calendário editorial ativo com primeiros 30 dias programados',co:''},
 ]},
 ];
 
 let data, filter='all';
 const collapsed={}, expanded={};
-let dragSrc=null, dragGid=null, dragIdx=null;
+let dragIdx=null, dragGid=null, dragSrc=null;
+
+function prazoCls(dateStr){
+  if(!dateStr)return '';
+  const d=new Date(dateStr+'T00:00:00');
+  const now=new Date();now.setHours(0,0,0,0);
+  const diff=(d-now)/86400000;
+  if(diff<0)return 'prazo-vencido';
+  if(diff<=7)return 'prazo-urgente';
+  return '';
+}
+function fmtDate(dateStr){
+  if(!dateStr)return '';
+  const d=new Date(dateStr+'T00:00:00');
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'2-digit'});
+}
 
 function load(){
-  try{const s=localStorage.getItem('ocean_rdm_v4');data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEF));}
+  try{const s=localStorage.getItem('ocean_rdm_v5');data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEF));}
   catch(e){data=JSON.parse(JSON.stringify(DEF));}
 }
 function save(){
-  localStorage.setItem('ocean_rdm_v4',JSON.stringify(data));
+  localStorage.setItem('ocean_rdm_v5',JSON.stringify(data));
   const el=document.getElementById('rdm-saved');
   if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2000);}
 }
-window.rdmReset=function(){
-  if(!confirm('Resetar todas as alterações para os dados originais?'))return;
-  localStorage.removeItem('ocean_rdm_v4');
-  data=JSON.parse(JSON.stringify(DEF));
-  render();
-};
 window.rdmStatus=function(gid,tid,sel){
   const g=data.find(x=>x.id===gid);if(!g)return;
   const t=g.tasks.find(x=>x.id===tid);if(!t)return;
@@ -1080,8 +1094,13 @@ window.rdmCell=function(gid,tid,field,el){
   const g=data.find(x=>x.id===gid);if(!g)return;
   const t=g.tasks.find(x=>x.id===tid);if(!t)return;
   const val=el.textContent.trim();t[field]=val;
-  el.classList.toggle('ce-empty',!val);
-  save();
+  el.classList.toggle('ce-empty',!val);save();
+};
+window.rdmDate=function(gid,tid,field,el){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
+  t[field]=el.value;save();
+  if(field==='p'){const td=el.closest('td');if(td)td.className=prazoCls(el.value);}
 };
 window.rdmExpCell=function(gid,tid,field,el){
   const g=data.find(x=>x.id===gid);if(!g)return;
@@ -1114,8 +1133,6 @@ window.rdmExpand=function(gid,tid){
   if(row)row.style.display=expanded[key]?'':'none';
   if(btn)btn.textContent=expanded[key]?'▾':'▸';
 };
-
-// Drag and drop
 window.rdmDragStart=function(e,gid,idx){
   dragGid=gid;dragIdx=idx;dragSrc=e.currentTarget;
   e.dataTransfer.effectAllowed='move';
@@ -1127,12 +1144,9 @@ window.rdmDragEnd=function(e){
   dragSrc=null;
 };
 window.rdmDragOver=function(e,gid,idx){
-  e.preventDefault();
-  if(dragGid!==gid)return;
-  e.dataTransfer.dropEffect='move';
-  const tr=e.currentTarget;
+  e.preventDefault();if(dragGid!==gid)return;
   document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
-  tr.classList.add('drag-over');
+  e.currentTarget.classList.add('drag-over');
 };
 window.rdmDrop=function(e,gid,idx){
   e.preventDefault();
@@ -1157,40 +1171,40 @@ function renderGroup(g){
     const key=g.id+':'+t.id;
     const isExp=!!expanded[key];
     const sc=SC[t.s]||'s-iniciar';
-    const noT=!t.t;const noA=!t.a;const noR=!t.r;const noP=!t.p;
+    const pc=prazoCls(t.p);
     return `<tr class="rdm-data-row" id="rdm-row-${key}"
         draggable="true"
         ondragstart="rdmDragStart(event,'${g.id}',${globalIdx})"
         ondragend="rdmDragEnd(event)"
         ondragover="rdmDragOver(event,'${g.id}',${globalIdx})"
         ondrop="rdmDrop(event,'${g.id}',${globalIdx})">
-      <td style="text-align:center;cursor:grab;"><span class="rdm-drag">⠿</span></td>
+      <td style="text-align:center;"><span class="rdm-drag">⠿</span></td>
       <td><button class="rdm-del" onclick="rdmDel('${g.id}','${t.id}')">✕</button></td>
-      <td contenteditable="true" data-ph="Tarefa..." class="${noT?'ce-empty':''}"
+      <td contenteditable="true" data-ph="Tarefa..." class="${!t.t?'ce-empty':''}"
           onblur="rdmCell('${g.id}','${t.id}','t',this)">${t.t}</td>
-      <td contenteditable="true" data-ph="Mês/Ano" class="${noP?'ce-empty':''}"
-          onblur="rdmCell('${g.id}','${t.id}','p',this)">${t.p}</td>
-      <td><select class="stsel ${sc}" onchange="rdmStatus('${g.id}','${t.id}',this)">${stOpts(t.s)}</select></td>
-      <td contenteditable="true" data-ph="Área" class="${noA?'ce-empty':''}"
+      <td contenteditable="true" data-ph="Área" class="${!t.a?'ce-empty':''}"
           onblur="rdmCell('${g.id}','${t.id}','a',this)">${t.a}</td>
-      <td contenteditable="true" data-ph="Responsável" class="${noR?'ce-empty':''}"
+      <td><select class="stsel ${sc}" onchange="rdmStatus('${g.id}','${t.id}',this)">${stOpts(t.s)}</select></td>
+      <td contenteditable="true" data-ph="Responsável" class="${!t.r?'ce-empty':''}"
           onblur="rdmCell('${g.id}','${t.id}','r',this)">${t.r}</td>
+      <td class="${pc}"><input type="date" class="rdm-date-input" value="${t.p||''}"
+          onchange="rdmDate('${g.id}','${t.id}','p',this)" title="${t.p?fmtDate(t.p):''}"></td>
+      <td><input type="date" class="rdm-date-input" value="${t.co||''}"
+          onchange="rdmDate('${g.id}','${t.id}','co',this)" title="${t.co?fmtDate(t.co):''}"></td>
       <td style="text-align:center;"><button class="rdm-exp-btn" id="rdm-expbtn-${key}" onclick="rdmExpand('${g.id}','${t.id}')">${isExp?'▾':'▸'}</button></td>
     </tr>
     <tr class="rdm-expand-row" id="rdm-exp-${key}" style="display:${isExp?'':'none'};">
-      <td colspan="8">
+      <td colspan="9">
         <div class="rdm-expand-inner">
-          <div class="rdm-expand-section">
+          <div>
             <div class="rdm-expand-label">⚙ Como executar</div>
-            <textarea class="rdm-expand-field" placeholder="Passo a passo para executar esta tarefa..." rows="4" onblur="rdmExpCell('${g.id}','${t.id}','c',this)">${t.c||''}</textarea>
+            <textarea class="rdm-expand-field" placeholder="Passo a passo para executar..." rows="4"
+              onblur="rdmExpCell('${g.id}','${t.id}','c',this)">${t.c||''}</textarea>
           </div>
-          <div class="rdm-expand-section">
+          <div>
             <div class="rdm-expand-label">✓ Resultado esperado</div>
-            <textarea class="rdm-expand-field" placeholder="O que será alcançado concretamente..." rows="4" onblur="rdmExpCell('${g.id}','${t.id}','re',this)">${t.re||''}</textarea>
-          </div>
-          <div class="rdm-expand-section">
-            <div class="rdm-expand-label">📅 Conclusão / Data</div>
-            <textarea class="rdm-expand-field" placeholder="Data de conclusão ou observações finais..." rows="4" onblur="rdmExpCell('${g.id}','${t.id}','co',this)">${t.co||''}</textarea>
+            <textarea class="rdm-expand-field" placeholder="O que será alcançado concretamente..." rows="4"
+              onblur="rdmExpCell('${g.id}','${t.id}','re',this)">${t.re||''}</textarea>
           </div>
         </div>
       </td>
@@ -1210,8 +1224,8 @@ function renderGroup(g){
     </div>
     <div id="rdm-c-${g.id}">
       ${vis.length>0?`<div class="rdm-tbl-wrap"><table class="rdm-tbl">
-        <colgroup><col/><col/><col/><col/><col/><col/><col/><col/></colgroup>
-        <thead><tr><th></th><th></th><th>Tarefa</th><th>Prazo</th><th>Status</th><th>Área</th><th>Responsável</th><th></th></tr></thead>
+        <colgroup><col/><col/><col/><col/><col/><col/><col/><col/><col/></colgroup>
+        <thead><tr><th></th><th></th><th>Tarefa</th><th>Área</th><th>Status</th><th>Responsável</th><th>Prazo</th><th>Conclusão</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table></div>`:`<div style="padding:14px 18px;color:var(--g400);font-size:12px;">Nenhuma tarefa neste filtro.</div>`}
       <button class="rdm-add" onclick="rdmAdd('${g.id}')">+ Adicionar tarefa</button>
@@ -1223,20 +1237,23 @@ function updateProg(gid){
   const g=data.find(x=>x.id===gid);if(!g)return;
   const total=g.tasks.length,done=g.tasks.filter(t=>t.s==='Feito').length;
   const pct=total?Math.round(done/total*100):0;
-  const pf=document.getElementById('rdm-pf-'+gid);const pc=document.getElementById('rdm-pct-'+gid);
+  const pf=document.getElementById('rdm-pf-'+gid),pc=document.getElementById('rdm-pct-'+gid);
   if(pf)pf.style.width=pct+'%';if(pc)pc.textContent=pct+'%';
 }
 function updateSummary(){
   const all=data.flatMap(g=>g.tasks);
   const cnt={};SS.forEach(s=>cnt[s]=0);all.forEach(t=>{if(cnt[t.s]!==undefined)cnt[t.s]++;});
+  const today=new Date();today.setHours(0,0,0,0);
+  const vencidas=all.filter(t=>t.s!=='Feito'&&t.p&&new Date(t.p+'T00:00:00')<today).length;
   const total=all.length,done=cnt['Feito'];
   const pct=total?Math.round(done/total*100):0;
   document.getElementById('rdm-summary').innerHTML=`
     <div class="rsc"><div class="rv">${total}</div><div class="rl">Total</div></div>
     <div class="rsc"><div class="rv" style="color:#1a7a4a;">${done}</div><div class="rl">Feito</div></div>
-    <div class="rsc"><div class="rv" style="color:#1a4db7;">${cnt['Em andamento']}</div><div class="rl">Em andamento</div></div>
-    <div class="rsc"><div class="rv" style="color:#b76200;">${cnt['Iniciar']}</div><div class="rl">A iniciar</div></div>
-    <div class="rsc"><div class="rv" style="color:#b71a1a;">${cnt['Bloqueado']}</div><div class="rl">Bloqueado</div></div>
+    <div class="rsc"><div class="rv" style="color:#8a6800;">${cnt['Em andamento']}</div><div class="rl">Em andamento</div></div>
+    <div class="rsc"><div class="rv" style="color:#b71a1a;">${cnt['Iniciar']}</div><div class="rl">A iniciar</div></div>
+    <div class="rsc"><div class="rv" style="color:#6b2db7;">${cnt['Bloqueado']}</div><div class="rl">Bloqueado</div></div>
+    ${vencidas>0?`<div class="rsc"><div class="rv" style="color:#b71a1a;">${vencidas}</div><div class="rl">Vencidas</div></div>`:''}
     <div class="rsc rc-prog"><div style="font-size:11px;font-weight:700;color:var(--navy);">${pct}% concluído</div><div class="rdm-pbo"><div class="rdm-pbi" style="width:${pct}%;"></div></div></div>`;
 }
 function render(){
