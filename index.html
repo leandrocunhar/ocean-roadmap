@@ -1515,6 +1515,1122 @@ function showPage(page) {
   function updateCursor(){
     if(!canvas)return;
     if(tool==='text'){canvas.style.cursor='text';return;}
+    if(tool==='rect'||tool==='circ// ── Whiteboard (infinite canvas, vector model) ──────────────────
+(function(){
+  'use strict';
+  // ─── State ───────────────────────────────────────────────────
+  let tool='pen', wbColor='#1c1c1e', wbSize=2;
+  let panX=0, panY=0, zoom=1;
+  let isPanning=false, spaceDown=false;
+  let panSX=0, panSY=0, panSPX=0, panSPY=0;
+  let drawing=false, startWX=0, startWY=0;
+  let ops=[], undoStack=[], currentStroke=null, previewOp=null;
+  let wbReady=false, raf=null;
+  let canvas, ctx, textInput, imgOverlay, imgEl, imgState=null, imgDragActive=false;
+
+  // ─── Init ────────────────────────────────────────────────────
+  window.wbInit=function(){
+    if(wbReady)return;
+    canvas=document.getElementById('wb-canvas');
+    ctx=canvas.getContext('2d');
+    textInput=document.getElementById('wb-text-input');
+    imgOverlay=document.getElementById('wb-img-overlay');
+    imgEl=document.getElementById('wb-img-el');
+    resizeCanvas();
+    window.addEventListener('resize',resizeCanvas);
+    bindDraw();
+    bindImg();
+    load();
+    // start centered
+    panX=canvas.width/2; panY=canvas.height/2;
+    updateCursor(); scheduleDraw();
+    wbReady=true;
+  };
+
+  function resizeCanvas(){
+    if(!canvas)return;
+    const wrap=document.getElementById('wb-canvas-wrap');
+    canvas.width=wrap.clientWidth; canvas.height=wrap.clientHeight;
+    scheduleDraw();
+  }
+
+  function scheduleDraw(){
+    if(raf)cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(draw);
+  }
+
+  // ─── World ↔ Screen ──────────────────────────────────────────
+  function toW(sx,sy){return{x:(sx-panX)/zoom,y:(sy-panY)/zoom};}
+
+  // ─── Render ──────────────────────────────────────────────────
+  function draw(){
+    raf=null;
+    const W=canvas.width, H=canvas.height;
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle='#f5f5f7'; ctx.fillRect(0,0,W,H);
+    drawGrid(W,H);
+    ctx.setTransform(zoom,0,0,zoom,panX,panY);
+    ops.forEach(renderOp);
+    if(currentStroke&&currentStroke.pts.length>1)renderOp(currentStroke);
+    if(previewOp)renderOp(previewOp);
+    ctx.setTransform(1,0,0,1,0,0);
+    // zoom label
+    const lbl=document.getElementById('wb-zoom-lbl');
+    if(lbl)lbl.textContent=Math.round(zoom*100)+'%';
+  }
+
+  function drawGrid(W,H){
+    const gw=40*zoom;
+    const ox=((panX%gw)+gw)%gw, oy=((panY%gw)+gw)%gw;
+    ctx.fillStyle='rgba(0,0,0,0.07)';
+    for(let x=ox;x<W;x+=gw)for(let y=oy;y<H;y+=gw){
+      ctx.beginPath();ctx.arc(x,y,1,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  function renderOp(op){
+    ctx.save();
+    ctx.strokeStyle=op.color; ctx.fillStyle=op.color;
+    ctx.lineWidth=op.lw; ctx.lineCap='round'; ctx.lineJoin='round';
+    switch(op.type){
+      case 'pen':
+        if(!op.pts||op.pts.length<2)break;
+        ctx.beginPath();ctx.moveTo(op.pts[0].x,op.pts[0].y);
+        for(let i=1;i<op.pts.length;i++)ctx.lineTo(op.pts[i].x,op.pts[i].y);
+        ctx.stroke(); break;
+      case 'eraser':
+        ctx.strokeStyle='#f5f5f7';
+        if(!op.pts||op.pts.length<2)break;
+        ctx.lineWidth=op.lw;
+        ctx.beginPath();ctx.moveTo(op.pts[0].x,op.pts[0].y);
+        for(let i=1;i<op.pts.length;i++)ctx.lineTo(op.pts[i].x,op.pts[i].y);
+        ctx.stroke(); break;
+      case 'rect':
+        ctx.strokeRect(op.x,op.y,op.w,op.h); break;
+      case 'circle':
+        ctx.beginPath();
+        ctx.ellipse(op.x+op.w/2,op.y+op.h/2,Math.abs(op.w)/2,Math.abs(op.h)/2,0,0,Math.PI*2);
+        ctx.stroke(); break;
+      case 'arrow':
+        const ang=Math.atan2(op.y2-op.y1,op.x2-op.x1),L=Math.max(12,op.lw*3);
+        ctx.beginPath();ctx.moveTo(op.x1,op.y1);ctx.lineTo(op.x2,op.y2);ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(op.x2,op.y2);
+        ctx.lineTo(op.x2-L*Math.cos(ang-Math.PI/6),op.y2-L*Math.sin(ang-Math.PI/6));
+        ctx.lineTo(op.x2-L*Math.cos(ang+Math.PI/6),op.y2-L*Math.sin(ang+Math.PI/6));
+        ctx.closePath();ctx.fill(); break;
+      case 'text':
+        ctx.font='600 '+op.fs+'px Inter,-apple-system,sans-serif';
+        ctx.fillText(op.text,op.x,op.y); break;
+      case 'image':
+        if(op.img&&op.img.complete)ctx.drawImage(op.img,op.x,op.y,op.w,op.h); break;
+    }
+    ctx.restore();
+  }
+
+  // ─── Storage ─────────────────────────────────────────────────
+  function persist(){
+    try{
+      const d=ops.map(o=>{
+        if(o.type==='image'){
+          try{
+            const t=document.createElement('canvas');
+            t.width=o.img.naturalWidth||o.w;t.height=o.img.naturalHeight||o.h;
+            t.getContext('2d').drawImage(o.img,0,0);
+            return{...o,imgSrc:t.toDataURL('image/jpeg',.8),img:undefined};
+          }catch(e){return{...o,img:undefined};}
+        }
+        return o;
+      });
+      localStorage.setItem('ocean_wb_v2',JSON.stringify(d));
+    }catch(e){}
+  }
+
+  function load(){
+    try{
+      const s=localStorage.getItem('ocean_wb_v2');
+      if(!s)return;
+      ops=JSON.parse(s).map(o=>{
+        if(o.type==='image'&&o.imgSrc){
+          const img=new Image();img.src=o.imgSrc;img.onload=scheduleDraw;
+          return{...o,img};
+        }
+        return o;
+      });
+    }catch(e){ops=[];}
+  }
+
+  function snapshot(){
+    undoStack.push(JSON.stringify(ops.map(o=>o.type==='image'?{...o,img:undefined}:o)));
+    if(undoStack.length>30)undoStack.shift();
+  }
+
+  // ─── Drawing events ──────────────────────────────────────────
+  function bindDraw(){
+    const wrap=document.getElementById('wb-canvas-wrap');
+
+    canvas.addEventListener('mousedown',function(e){
+      if(imgState)return;
+      if(tool==='text'){showText(e);return;}
+      const pan=e.button===1||(e.button===0&&spaceDown);
+      if(pan){
+        isPanning=true;
+        panSX=e.clientX;panSY=e.clientY;panSPX=panX;panSPY=panY;
+        canvas.style.cursor='grabbing';
+        e.preventDefault();return;
+      }
+      if(e.button!==0)return;
+      const r=canvas.getBoundingClientRect();
+      const wpt=toW(e.clientX-r.left,e.clientY-r.top);
+      drawing=true;startWX=wpt.x;startWY=wpt.y;
+      if(tool==='pen'||tool==='eraser'){
+        snapshot();
+        currentStroke={type:tool,color:tool==='eraser'?'#f5f5f7':wbColor,lw:tool==='eraser'?wbSize*6:wbSize,pts:[{x:wpt.x,y:wpt.y}]};
+      }
+    });
+
+    canvas.addEventListener('mousemove',function(e){
+      if(imgDragActive)return;
+      if(isPanning){
+        panX=panSPX+(e.clientX-panSX);panY=panSPY+(e.clientY-panSY);
+        scheduleDraw();return;
+      }
+      if(!drawing)return;
+      const r=canvas.getBoundingClientRect();
+      const wpt=toW(e.clientX-r.left,e.clientY-r.top);
+      if(tool==='pen'||tool==='eraser'){
+        currentStroke.pts.push({x:wpt.x,y:wpt.y});scheduleDraw();
+      }else{
+        const lw=wbSize;
+        if(tool==='rect') previewOp={type:'rect',color:wbColor,lw,x:startWX,y:startWY,w:wpt.x-startWX,h:wpt.y-startWY};
+        else if(tool==='circle') previewOp={type:'circle',color:wbColor,lw,x:startWX,y:startWY,w:wpt.x-startWX,h:wpt.y-startWY};
+        else if(tool==='arrow') previewOp={type:'arrow',color:wbColor,lw,x1:startWX,y1:startWY,x2:wpt.x,y2:wpt.y};
+        scheduleDraw();
+      }
+    });
+
+    function endDraw(e){
+      if(isPanning){isPanning=false;updateCursor();return;}
+      if(!drawing)return;drawing=false;
+      if(tool==='pen'||tool==='eraser'){
+        if(currentStroke&&currentStroke.pts.length>1){ops.push(currentStroke);persist();}
+        currentStroke=null;
+      }else if(previewOp){
+        ops.push(previewOp);previewOp=null;persist();
+      }
+      scheduleDraw();
+    }
+    canvas.addEventListener('mouseup',endDraw);
+    canvas.addEventListener('mouseleave',function(e){
+      if(drawing&&(tool==='pen'||tool==='eraser')){
+        if(currentStroke&&currentStroke.pts.length>1){ops.push(currentStroke);persist();}
+        currentStroke=null;drawing=false;scheduleDraw();
+      }
+    });
+
+    // Zoom: Ctrl+scroll; Pan: scroll
+    wrap.addEventListener('wheel',function(e){
+      if(e.ctrlKey||e.metaKey){
+        e.preventDefault();
+        const r=canvas.getBoundingClientRect();
+        const mx=e.clientX-r.left,my=e.clientY-r.top;
+        const f=e.deltaY>0?0.9:1.111;
+        const nz=Math.max(0.05,Math.min(8,zoom*f));
+        panX=mx-(mx-panX)*(nz/zoom);panY=my-(my-panY)*(nz/zoom);
+        zoom=nz;updateCursor();scheduleDraw();
+      }else{
+        panX-=e.deltaX;panY-=e.deltaY;scheduleDraw();
+      }
+    },{passive:false});
+
+    // Space = pan mode
+    document.addEventListener('keydown',function(e){
+      const wb=document.getElementById('page-whiteboard');
+      if(!wb||wb.style.display==='none')return;
+      if(e.code==='Space'&&document.activeElement===document.body){
+        if(!spaceDown){spaceDown=true;updateCursor();}
+        e.preventDefault();
+      }
+      if(imgState){
+        if(e.key==='Enter'){e.preventDefault();window.wbImgCommit();return;}
+        if(e.key==='Escape'){e.preventDefault();window.wbImgCancel();return;}
+      }
+      if(e.ctrlKey&&e.key==='z'){e.preventDefault();window.wbUndo();}
+    });
+    document.addEventListener('keyup',function(e){
+      if(e.code==='Space'){spaceDown=false;if(!isPanning)updateCursor();}
+    });
+
+    // Text input
+    textInput.addEventListener('mousedown',function(e){e.stopPropagation();});
+    textInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();commitText();}});
+    textInput.addEventListener('blur',function(){setTimeout(commitText,100);});
+  }
+
+  function showText(e){
+    textInput.style.left=e.clientX+'px';textInput.style.top=e.clientY+'px';
+    const fs=Math.max(16,wbSize*5);
+    textInput.style.fontSize=fs+'px';textInput.style.color=wbColor;
+    textInput.style.display='block';textInput.value='';
+    setTimeout(function(){textInput.focus();},10);
+  }
+
+  function commitText(){
+    if(textInput.style.display==='none')return;
+    const val=textInput.value.trim();textInput.style.display='none';
+    if(!val)return;
+    const r=canvas.getBoundingClientRect();
+    const fs=parseInt(textInput.style.fontSize)||18;
+    const wpt=toW(parseFloat(textInput.style.left)-r.left,parseFloat(textInput.style.top)-r.top);
+    snapshot();
+    ops.push({type:'text',color:wbColor,fs:fs/zoom,x:wpt.x,y:wpt.y+fs/zoom,text:val});
+    persist();scheduleDraw();
+  }
+
+  // ─── Cursor ──────────────────────────────────────────────────
+  function updateCursor(){
+    if(!canvas)return;
+    if(spaceDown||isPanning){canvas.style.cursor=isPanning?'grabbing':'grab';return;}
+    if(tool==='text'){canvas.style.cursor='text';return;}
+    if(tool==='rect'||tool==='circle'||tool==='arrow'){canvas.style.cursor='crosshair';return;}
+    const sw=tool==='eraser'?wbSize*6*zoom:wbSize*zoom;
+    const rad=Math.max(sw/2,2),d=Math.ceil(rad)+4,side=d*2;
+    const tmp=document.createElement('canvas');tmp.width=side;tmp.height=side;
+    const cx=tmp.getContext('2d');
+    cx.beginPath();cx.arc(d,d,rad,0,Math.PI*2);
+    if(tool==='eraser'){cx.fillStyle='rgba(255,255,255,.9)';cx.fill();cx.strokeStyle='#888';cx.lineWidth=1.5;cx.stroke();}
+    else{cx.fillStyle=wbColor;cx.fill();cx.strokeStyle='rgba(0,0,0,.25)';cx.lineWidth=1;cx.stroke();}
+    canvas.style.cursor='url('+tmp.toDataURL()+') '+d+' '+d+', crosshair';
+  }
+
+  // ─── Image paste ─────────────────────────────────────────────
+  function bindImg(){
+    imgOverlay.addEventListener('mousedown',function(e){
+      if(e.target.classList.contains('wb-img-handle'))return;
+      e.stopPropagation();if(!imgState)return;
+      imgDragActive=true;imgState.resizeCorner=null;
+      imgState.dsx=e.clientX;imgState.dsy=e.clientY;imgState.ox=imgState.x;imgState.oy=imgState.y;
+    });
+    imgOverlay.querySelectorAll('.wb-img-handle').forEach(function(h){
+      h.addEventListener('mousedown',function(e){
+        e.stopPropagation();if(!imgState)return;
+        imgDragActive=true;imgState.resizeCorner=h.dataset.corner;
+        imgState.dsx=e.clientX;imgState.dsy=e.clientY;
+        imgState.ox=imgState.x;imgState.oy=imgState.y;imgState.ow=imgState.w;imgState.oh=imgState.h;
+      });
+    });
+    document.addEventListener('mousemove',function(e){
+      if(!imgDragActive||!imgState)return;
+      const dx=e.clientX-imgState.dsx,dy=e.clientY-imgState.dsy;
+      const c=imgState.resizeCorner;
+      if(c){
+        let nw=imgState.ow,nh=imgState.oh,nx=imgState.ox,ny=imgState.oy;
+        if(c==='se'){nw=Math.max(40,imgState.ow+dx);nh=Math.max(40,imgState.oh+dy);}
+        else if(c==='sw'){nw=Math.max(40,imgState.ow-dx);nh=Math.max(40,imgState.oh+dy);nx=imgState.ox+imgState.ow-nw;}
+        else if(c==='ne'){nw=Math.max(40,imgState.ow+dx);nh=Math.max(40,imgState.oh-dy);ny=imgState.oy+imgState.oh-nh;}
+        else if(c==='nw'){nw=Math.max(40,imgState.ow-dx);nh=Math.max(40,imgState.oh-dy);nx=imgState.ox+imgState.ow-nw;ny=imgState.oy+imgState.oh-nh;}
+        imgState.w=nw;imgState.h=nh;imgState.x=nx;imgState.y=ny;
+      }else{imgState.x=imgState.ox+dx;imgState.y=imgState.oy+dy;}
+      updImgOv();
+    });
+    document.addEventListener('mouseup',function(){
+      if(imgDragActive){imgDragActive=false;if(imgState)imgState.resizeCorner=null;}
+    });
+    document.addEventListener('paste',function(e){
+      const wb=document.getElementById('page-whiteboard');
+      if(!wb||wb.style.display==='none')return;
+      const items=e.clipboardData&&e.clipboardData.items;if(!items)return;
+      for(let i=0;i<items.length;i++){
+        if(items[i].type.startsWith('image/')){loadImgBlob(items[i].getAsFile());e.preventDefault();break;}
+      }
+    });
+  }
+
+  function loadImgBlob(blob){
+    if(imgState)window.wbImgCancel();
+    const url=URL.createObjectURL(blob);
+    const img=new Image();
+    img.onload=function(){
+      const mw=canvas.width*.7,mh=canvas.height*.7;
+      const sc=Math.min(1,mw/img.naturalWidth,mh/img.naturalHeight);
+      const sw=Math.round(img.naturalWidth*sc),sh=Math.round(img.naturalHeight*sc);
+      const sx=Math.round((canvas.width-sw)/2),sy=Math.round((canvas.height-sh)/2);
+      imgEl.src=url;
+      imgState={x:sx,y:sy,w:sw,h:sh,img:img,resizeCorner:null,dsx:0,dsy:0,ox:sx,oy:sy,ow:sw,oh:sh};
+      imgOverlay.style.display='block';updImgOv();
+    };
+    img.src=url;
+  }
+
+  function updImgOv(){
+    if(!imgOverlay||!imgState)return;
+    imgOverlay.style.left=imgState.x+'px';imgOverlay.style.top=imgState.y+'px';
+    imgOverlay.style.width=imgState.w+'px';imgOverlay.style.height=imgState.h+'px';
+  }
+
+  window.wbImgCommit=function(){
+    if(!canvas||!imgState)return;
+    const wx=(imgState.x-panX)/zoom,wy=(imgState.y-panY)/zoom;
+    const ww=imgState.w/zoom,wh=imgState.h/zoom;
+    snapshot();
+    const img=imgEl;
+    ops.push({type:'image',x:wx,y:wy,w:ww,h:wh,img:img,imgSrc:img.src});
+    persist();scheduleDraw();
+    imgOverlay.style.display='none';imgState=null;imgDragActive=false;
+  };
+  window.wbImgCancel=function(){
+    if(imgOverlay)imgOverlay.style.display='none';
+    imgState=null;imgDragActive=false;
+  };
+  window.wbPasteImg=async function(){
+    try{
+      const items=await navigator.clipboard.read();
+      for(const item of items)for(const type of item.types)
+        if(type.startsWith('image/')){loadImgBlob(await item.getType(type));return;}
+      alert('Nenhuma imagem no clipboard.\nUse Ctrl+V diretamente no whiteboard.');
+    }catch(e){alert('Use Ctrl+V para colar imagens no whiteboard.');}
+  };
+
+  // ─── Controls ────────────────────────────────────────────────
+  window.wbSetTool=function(t){
+    tool=t;
+    document.querySelectorAll('.wb-tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
+    updateCursor();
+  };
+  window.wbSetColor=function(c){
+    wbColor=c;
+    document.querySelectorAll('.wb-color').forEach(b=>b.classList.toggle('active',b.dataset.color===c));
+    updateCursor();
+  };
+  window.wbSetSize=function(s){
+    wbSize=s;
+    document.querySelectorAll('.wb-size-btn').forEach(b=>b.classList.toggle('active',+b.dataset.size===+s));
+    updateCursor();
+  };
+  window.wbUndo=function(){
+    if(!undoStack.length)return;
+    try{
+      ops=JSON.parse(undoStack.pop()).map(o=>{
+        if(o.type==='image'&&o.imgSrc){const img=new Image();img.src=o.imgSrc;img.onload=scheduleDraw;return{...o,img};}
+        return o;
+      });
+    }catch(e){ops=[];}
+    persist();scheduleDraw();
+  };
+  window.wbClear=function(){
+    if(!confirm('Apagar tudo no whiteboard?'))return;
+    undoStack=[];ops=[];
+    panX=canvas?canvas.width/2:0;panY=canvas?canvas.height/2:0;zoom=1;
+    updateCursor();
+    try{localStorage.removeItem('ocean_wb_v2');}catch(e){}
+    scheduleDraw();
+  };
+  window.wbZoomIn=function(){
+    const f=1.25;zoom=Math.min(8,zoom*f);
+    panX=canvas.width/2-(canvas.width/2-panX)*f;panY=canvas.height/2-(canvas.height/2-panY)*f;
+    updateCursor();scheduleDraw();
+  };
+  window.wbZoomOut=function(){
+    const f=1.25;zoom=Math.max(0.05,zoom/f);
+    panX=canvas.width/2-(canvas.width/2-panX)/f;panY=canvas.height/2-(canvas.height/2-panY)/f;
+    updateCursor();scheduleDraw();
+  };
+  window.wbZoomReset=function(){
+    zoom=1;panX=canvas?canvas.width/2:0;panY=canvas?canvas.height/2:0;
+    updateCursor();scheduleDraw();
+  };
+  window.wbExport=function(){
+    if(!canvas)return;
+    const link=document.createElement('a');link.download='whiteboard.png';
+    link.href=canvas.toDataURL('image/png');link.click();
+  };
+})();
+</script>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--red);">
+            <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 1</div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;">Estruturar papéis, processos e contratos</div>
+            <div style="font-size:11px;color:var(--g500);">Organograma, indicadores, modelo de comissão, contratos com prestadores</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--red);">
+            <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 2</div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;">Distribuir a geração de negócios</div>
+            <div style="font-size:11px;color:var(--g500);">Reduzir dependência de Fábio no BD; desenvolver autonomia comercial do time</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horizonte 2 -->
+      <div style="margin-bottom:18px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--orange);">Horizonte 2 — Estabilizar</div>
+          <div style="flex:1;height:1px;background:var(--orange-l);"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--orange);">
+            <div style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 3 · Recorrente</div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;">Construir pipeline de talentos</div>
+            <div style="font-size:11px;color:var(--g500);">Processo contínuo de atração e desenvolvimento; reduz dependência de pessoas-chave</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--orange);">
+            <div style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 4</div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;">Otimizar performance financeira</div>
+            <div style="font-size:11px;color:var(--g500);">Margens, custo por placement, modelo de remuneração simplificado e sustentável</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horizonte 3 -->
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--blue);">Horizonte 3 — Crescer</div>
+          <div style="flex:1;height:1px;background:var(--blue-l);"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--blue);">
+            <div style="font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 5</div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;">Expandir possibilidades de receita</div>
+            <div style="font-size:11px;color:var(--g500);">People / EUA via parceria — ativar após operação estruturada</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--blue);">
+            <div style="font-size:10px;font-weight:700;color:var(--blue);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 6</div>
+            <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;">Revisar marca e posicionamento</div>
+            <div style="font-size:11px;color:var(--g500);">Atualizar identidade e posicionamento de mercado com a empresa já profissionalizada</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+</main>
+</div><!-- /page-diagnostico -->
+
+<div id="page-roadmap" style="display:none;">
+<div id="rdm-wrap" style="padding:20px 24px;max-width:1200px;margin:0 auto;">
+<style>
+#rdm-wrap{font-family:'Inter',-apple-system,sans-serif;}
+.rdm-top{margin-bottom:16px;}
+.rdm-title{font-size:18px;font-weight:800;color:var(--navy);}
+
+.rdm-summary{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.rsc{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:10px 14px;min-width:90px;}
+.rsc .rv{font-size:20px;font-weight:800;color:var(--navy);}
+.rsc .rl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g500);margin-top:1px;}
+.rsc.rc-prog{min-width:155px;}
+.rdm-pbo{background:var(--g200);height:6px;border-radius:3px;margin-top:6px;overflow:hidden;}
+.rdm-pbi{height:100%;background:#1a7a4a;border-radius:3px;transition:.3s;}
+/* Toolbars */
+
+
+.rft{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g500);margin-right:4px;white-space:nowrap;}
+.rfb{padding:5px 10px;border:1px solid var(--g200);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--g600);transition:.15s;font-family:inherit;}
+.rfb.active,.rfb:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.rdm-saved{font-size:10px;color:var(--g400);margin-left:auto;}
+/* Groups */
+.rdm-group{margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid var(--g200);}
+.rdm-gh{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none;background:#fff;}
+.rdm-gh:hover{background:var(--g50);}
+.rdm-badge{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap;}
+.rdm-gtitle{font-size:13px;font-weight:700;color:var(--navy);flex:1;}
+.rdm-horiz{font-size:10px;color:var(--g500);font-weight:600;white-space:nowrap;}
+.rdm-gprog{display:flex;align-items:center;gap:6px;}
+.rdm-gpb{width:72px;height:4px;background:var(--g200);border-radius:2px;overflow:hidden;}
+.rdm-gpf{height:100%;border-radius:2px;transition:.4s;}
+.rdm-gpct{font-size:10px;font-weight:700;color:var(--g500);min-width:26px;text-align:right;}
+.rdm-chev{color:var(--g400);font-size:12px;margin-left:4px;}
+/* Table */
+.rdm-tbl-wrap{overflow-x:auto;}
+.rdm-tbl{width:100%;border-collapse:collapse;background:#fff;table-layout:fixed;}
+.rdm-tbl colgroup col:nth-child(1){width:28px;}
+.rdm-tbl colgroup col:nth-child(2){width:28px;}
+.rdm-tbl colgroup col:nth-child(3){width:210px;}
+.rdm-tbl colgroup col:nth-child(4){width:88px;}
+.rdm-tbl colgroup col:nth-child(5){width:118px;}
+.rdm-tbl colgroup col:nth-child(6){width:148px;}
+.rdm-tbl colgroup col:nth-child(7){width:90px;}
+.rdm-tbl colgroup col:nth-child(8){width:90px;}
+.rdm-tbl colgroup col:nth-child(9){width:28px;}
+.rdm-tbl th{background:var(--g50);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--g500);padding:7px 10px;text-align:left;border-bottom:1px solid var(--g200);overflow:hidden;white-space:nowrap;}
+.rdm-tbl td{padding:6px 10px;font-size:12px;color:var(--navy);border-bottom:1px solid #f0f0f2;vertical-align:middle;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.rdm-tbl tr.rdm-data-row:hover td{background:#fafafa;}
+.rdm-tbl td[contenteditable]{outline:none;cursor:text;}
+.rdm-tbl td[contenteditable]:focus{background:#fffbea;box-shadow:inset 0 0 0 1.5px #f5a623;white-space:normal;overflow:visible;text-overflow:clip;}
+.rdm-tbl td.ce-empty:not(:focus):before{content:attr(data-ph);color:var(--g300);font-style:italic;}
+/* Drag */
+.rdm-drag{cursor:grab;color:var(--g300);font-size:14px;user-select:none;display:block;text-align:center;}
+.rdm-drag:hover{color:var(--g500);}
+.rdm-tbl tr.drag-over td{background:#e8f0ff;}
+/* Del */
+.rdm-del{background:none;border:none;color:var(--g300);cursor:pointer;font-size:12px;padding:1px 3px;opacity:0;display:block;margin:0 auto;}
+.rdm-tbl tr:hover .rdm-del{opacity:1;}
+.rdm-del:hover{color:#c00;}
+/* Status */
+.stsel{border:none;font-size:11px;font-weight:700;cursor:pointer;padding:3px 6px;border-radius:4px;outline:none;appearance:none;-webkit-appearance:none;font-family:inherit;width:100%;}
+.s-feito{background:#e6f9ef;color:#1a7a4a;}
+.s-andamento{background:#fffbe6;color:#8a6800;}
+.s-validar{background:#e6f0ff;color:#1a4db7;}
+.s-iniciar{background:#ffe6e6;color:#b71a1a;}
+.s-bloqueado{background:#f0e6ff;color:#6b2db7;}
+.s-adiado{background:#f0f0f0;color:#6e6e73;}
+/* Month select */
+.rdm-month-sel{border:none;background:transparent;font-size:11px;font-family:inherit;cursor:pointer;width:100%;padding:0;outline:none;appearance:none;-webkit-appearance:none;color:var(--navy);}
+td.prazo-atual .rdm-month-sel{font-weight:700;color:var(--navy);}
+td.co-ontime .rdm-month-sel{color:#1a7a4a;font-weight:600;}
+td.co-late .rdm-month-sel{color:#b71a1a;font-weight:600;}
+/* Responsável multi-select */
+.rdm-resp-cell{position:relative;}
+.rdm-resp-trigger{cursor:pointer;display:flex;align-items:center;gap:4px;}
+.rdm-resp-display{font-size:11px;color:var(--navy);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rdm-resp-display.empty{color:var(--g300);font-style:italic;}
+.rdm-resp-arrow{color:var(--g400);font-size:9px;flex-shrink:0;}
+#rdm-resp-overlay{position:fixed;background:#fff;border:1px solid var(--g200);border-radius:8px;padding:6px;z-index:9999;min-width:160px;box-shadow:0 4px 16px rgba(0,0,0,.15);display:none;}
+#rdm-resp-overlay label{display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:11px;cursor:pointer;border-radius:5px;white-space:nowrap;}
+#rdm-resp-overlay label:hover{background:var(--g50);}
+#rdm-resp-overlay input[type=checkbox]{cursor:pointer;accent-color:var(--navy);}
+/* Expand */
+.rdm-exp-btn{background:none;border:none;cursor:pointer;color:var(--g400);font-size:11px;padding:2px 4px;font-family:inherit;display:block;margin:0 auto;}
+.rdm-exp-btn:hover{color:var(--navy);}
+.rdm-expand-row td{background:#f7f7fa;padding:0;}
+.rdm-expand-inner{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 16px;}
+.rdm-expand-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--g500);margin-bottom:5px;}
+.rdm-expand-field{width:100%;min-height:64px;border:1px solid var(--g200);border-radius:6px;padding:8px 10px;font-size:11px;font-family:inherit;color:var(--navy);background:#fff;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5;}
+.rdm-expand-field:focus{border-color:#f5a623;box-shadow:0 0 0 2px #ffefc0;}
+.rdm-add{width:100%;padding:8px 14px;background:#fafafa;border:none;border-top:1px dashed var(--g200);color:var(--g400);font-size:11px;cursor:pointer;text-align:left;font-family:inherit;}
+.rdm-add:hover{background:#f0f0f0;color:var(--navy);}
+
+/* Filter button + dropdown */
+.rdm-filter-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.rdm-filter-btn{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--navy);display:flex;align-items:center;gap:8px;white-space:nowrap;}
+.rdm-filter-btn:hover{background:var(--g50);}
+.rdm-filter-btn.active-filter{background:var(--navy);color:#fff;border-color:var(--navy);}
+.rdm-flt-badge{background:#e74c3c;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;}
+.rdm-filter-btn.active-filter .rdm-flt-badge{background:rgba(255,255,255,.3);}
+#rdm-filter-dd{position:fixed;background:#fff;border:1px solid var(--g200);border-radius:10px;padding:16px;z-index:9999;min-width:260px;box-shadow:0 6px 24px rgba(0,0,0,.13);display:none;}
+.rdm-flt-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g400);margin-bottom:7px;}
+.rdm-flt-opts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px;}
+.rdm-flt-opts:last-child{margin-bottom:0;}
+.rdm-flt-opt{border:1px solid var(--g200);background:#fff;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--navy);}
+.rdm-flt-opt:hover{background:var(--g50);}
+.rdm-flt-opt.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── Whiteboard ──────────────────────────────────── */
+.wb-tool-btn{padding:5px 8px;border:1px solid transparent;border-radius:6px;cursor:pointer;background:transparent;font-family:inherit;color:var(--navy);transition:.12s;}
+.wb-tool-btn:hover{background:var(--g100);}
+.wb-tool-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.wb-color{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:.12s;}
+.wb-color:hover{transform:scale(1.15);}
+.wb-color.active{border-color:var(--navy);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--navy);}
+.wb-size-btn{border:1px solid transparent;border-radius:6px;cursor:pointer;background:transparent;color:var(--navy);}
+.wb-size-btn:hover{background:var(--g100);}
+.wb-size-btn.active{background:var(--g200);}
+.wb-action-btn{padding:5px 12px;border:1px solid var(--g200);border-radius:6px;cursor:pointer;background:#fff;font-size:11px;font-weight:600;font-family:inherit;color:var(--navy);transition:.12s;}
+.wb-action-btn:hover{background:var(--g50);}
+</style>
+
+<div class="rdm-top">
+  <div class="rdm-title">Roadmap 2026</div>
+</div>
+<div class="rdm-summary" id="rdm-summary"></div>
+<div class="rdm-filter-row">
+  <div style="position:relative;">
+    <button class="rdm-filter-btn" id="rdm-filter-btn" onclick="rdmFilterToggle(event,this)">
+      Filtros <span class="rdm-flt-badge" id="rdm-flt-badge" style="display:none"></span> <span style="opacity:.5;font-size:10px;">▾</span>
+    </button>
+    <div id="rdm-filter-dd" onclick="event.stopPropagation()">
+      <div class="rdm-flt-section">Status</div>
+      <div class="rdm-flt-opts" id="rdm-flt-status">
+        <button class="rdm-flt-opt active" data-f="all" onclick="rdmFltStatus(this,'all')">Todas</button>
+        <button class="rdm-flt-opt" data-f="Feito" onclick="rdmFltStatus(this,'Feito')">✓ Feito</button>
+        <button class="rdm-flt-opt" data-f="Validar" onclick="rdmFltStatus(this,'Validar')">Validar</button>
+        <button class="rdm-flt-opt" data-f="Em andamento" onclick="rdmFltStatus(this,'Em andamento')">Em andamento</button>
+        <button class="rdm-flt-opt" data-f="Iniciar" onclick="rdmFltStatus(this,'Iniciar')">Iniciar</button>
+        <button class="rdm-flt-opt" data-f="Bloqueado" onclick="rdmFltStatus(this,'Bloqueado')">Bloqueado</button>
+        <button class="rdm-flt-opt" data-f="Adiado" onclick="rdmFltStatus(this,'Adiado')">Adiado</button>
+      </div>
+      <div class="rdm-flt-section">Responsável</div>
+      <div class="rdm-flt-opts">
+        <button class="rdm-flt-opt active" data-r="all" onclick="rdmFltResp(this,'all')">Todos</button>
+        <button class="rdm-flt-opt" data-r="Leandro" onclick="rdmFltResp(this,'Leandro')">Leandro</button>
+        <button class="rdm-flt-opt" data-r="Fábio" onclick="rdmFltResp(this,'Fábio')">Fábio</button>
+        <button class="rdm-flt-opt" data-r="Fernando" onclick="rdmFltResp(this,'Fernando')">Fernando</button>
+        <button class="rdm-flt-opt" data-r="Especialista" onclick="rdmFltResp(this,'Especialista')">Especialista</button>
+        <button class="rdm-flt-opt" data-r="IA" onclick="rdmFltResp(this,'IA')">IA</button>
+      </div>
+    </div>
+  </div>
+  <span class="rdm-saved" id="rdm-saved"></span>
+</div>
+<div id="rdm-body"></div>
+</div>
+
+<script>
+(function(){
+const SC={'Feito':'s-feito','Em andamento':'s-andamento','Validar':'s-validar','Iniciar':'s-iniciar','Bloqueado':'s-bloqueado','Adiado':'s-adiado'};
+const SS=['Feito','Validar','Em andamento','Iniciar','Bloqueado','Adiado'];
+const COL={red:'#c0392b',orange:'#e67e22',blue:'#1a4db7',gray:'#5a5a5f'};
+const RESP=['Fábio','Fernando','Leandro','Especialista','IA'];
+const MONTHS=[
+  {v:'',l:'—'},
+  {v:'Jun/26',l:'Junho'},
+  {v:'Jul/26',l:'Julho'},
+  {v:'Ago/26',l:'Agosto'},
+  {v:'Set/26',l:'Setembro'},
+  {v:'Out/26',l:'Outubro'},
+  {v:'Nov/26',l:'Novembro'},
+  {v:'Dez/26',l:'Dezembro'},
+  {v:'Jan/27',l:'Janeiro/27'},
+  {v:'Fev/27',l:'Fevereiro/27'},
+  {v:'Mar/27',l:'Março/27'},
+  {v:'Abr/27',l:'Abril/27'},
+  {v:'Mai/27',l:'Maio/27'},
+  {v:'Jun/27',l:'Junho/27'},
+];
+const MONTH_N={Jan:1,Fev:2,Mar:3,Abr:4,Mai:5,Jun:6,Jul:7,Ago:8,Set:9,Out:10,Nov:11,Dez:12};
+
+function monthCls(val){
+  if(!val)return '';
+  const p=val.split('/');if(p.length!==2)return '';
+  const m=MONTH_N[p[0]],y=2000+parseInt(p[1]);
+  const now=new Date(),cm=now.getMonth()+1,cy=now.getFullYear();
+  return (y===cy&&m===cm)?'prazo-atual':'';
+}
+function monthNum(val){
+  if(!val)return null;
+  const p=val.split('/');if(p.length!==2)return null;
+  return (2000+parseInt(p[1]))*12+(MONTH_N[p[0]]||0);
+}
+function conclusaoCls(coVal,pVal){
+  const co=monthNum(coVal);if(!co)return '';
+  const p=monthNum(pVal);
+  return (!p||co<=p)?'co-ontime':'co-late';
+}
+function monthOpts(cur){
+  return MONTHS.map(o=>`<option value="${o.v}"${o.v===cur?' selected':''}>${o.l}</option>`).join('');
+}
+
+const DEF=[
+{id:'f0',label:'FASE 0',title:'Estruturação da Parceria',color:'gray',colorL:'#f2f2f7',horizonte:'',tasks:[
+  {id:'f0t1',t:'Organizar acessos',p:'Jun/26',s:'Feito',a:'Tecnologia',r:'Fernando',c:'1. Solicitar acesso às planilhas\n2. Organizar documentos no Drive\n3. Compartilhar diretrizes de R&S',re:'Planilha de controle, organograma e diretrizes R&S disponíveis',co:'Jun/26'},
+  {id:'f0t2',t:'Diagnóstico da operação + Definição de roadmap',p:'Jun/26',s:'Feito',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Levantar dados financeiros e operacionais\n2. Entrevistar Fábio e Fernando\n3. Construir dashboard\n4. Validar diagnóstico',re:'Dashboard Diagnóstico Ocean validado por Fábio e Fernando',co:'Jun/26'},
+  {id:'f0t3',t:'Organizar comunicação (agenda e pautas)',p:'Jun/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir cadência de reuniões\n2. Criar template de pauta\n3. Definir canal oficial (WhatsApp, e-mail)',re:'Agenda semanal ativa com pauta padrão',co:''},
+  {id:'f0t4',t:'Abrir CNPJ Leandro (Advisory)',p:'Jun/26',s:'Iniciar',a:'Jurídico',r:'Leandro',c:'1. Definir natureza jurídica (MEI/SLU)\n2. Registrar na Receita Federal\n3. Obter alvará municipal',re:'CNPJ ativo da Advisory',co:''},
+  {id:'f0t5',t:'Abrir conta PJ',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Leandro',c:'1. Aguardar CNPJ\n2. Comparar bancos digitais\n3. Abrir conta e ativar',re:'Conta PJ ativa para receber honorários',co:''},
+  {id:'f0t6',t:'Contrato de serviço com Ocean',p:'Jul/26',s:'Iniciar',a:'Jurídico',r:'Leandro, Fábio',c:'1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar',re:'Contrato assinado entre Advisory e Ocean',co:''},
+]},
+{id:'okr1',label:'OKR 1',title:'Estruturar papéis, processos e contratos',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
+  {id:'o1t1',t:'Redesenhar organograma e papéis',p:'Jul/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Mapear funções atuais\n2. Desenhar 3 verticais\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando',re:'Organograma aprovado com papéis e responsabilidades claras',co:''},
+  {id:'o1t2',t:'Revisar e simplificar modelo de remuneração',p:'Jun/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio, Fernando',c:'1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time',re:'Novo modelo simples, justo e compreensível por todos',co:''},
+  {id:'o1t3',t:'Desenhar plano de carreira',p:'Jul/26',s:'Bloqueado',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração',re:'Plano de carreira documentado e apresentado ao time',co:''},
+  {id:'o1t4',t:'Discutir com equipe e comunicar mudanças',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Fábio',c:'1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar',re:'Time alinhado e comprometido com as mudanças',co:''},
+  {id:'o1t5',t:'Formalizar contratos com prestadores',p:'Jul/26',s:'Bloqueado',a:'Jurídico',r:'Fernando, Fábio, Leandro',c:'1. Listar todos os prestadores ativos\n2. Revisar modelo de contrato\n3. Adaptar para cada perfil\n4. Assinar',re:'100% dos prestadores com contrato assinado',co:''},
+  {id:'o1t6',t:'Revisar cadência de reuniões de gestão',p:'Jul/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro, Fernando',c:'1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta\n3. Implementar',re:'Reuniões de gestão ativas com pauta e ata',co:''},
+  {id:'o1t7',t:'Criar sistema de gestão de contratos',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Mapear necessidades\n2. Avaliar Maggo vs planilha\n3. Configurar e treinar time',re:'Sistema ativo com todos os contratos cadastrados',co:''},
+]},
+{id:'okr2',label:'OKR 2',title:'Distribuir a geração de negócios',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
+  {id:'o2t1',t:'Implementar metas e KPIs comerciais',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Leandro, Fábio',c:'1. Definir KPIs por papel\n2. Criar dashboard de acompanhamento\n3. Revisar semanalmente',re:'KPIs definidos e monitorados por toda a equipe',co:''},
+  {id:'o2t2',t:'Criar processo estruturado de prospecção',p:'Jul/26',s:'Bloqueado',a:'Comercial',r:'Leandro, Fábio',c:'1. Mapear mercado-alvo (segmentos/porte)\n2. Criar playbook de BD com scripts\n3. Treinar Fábio\n4. Lançar primeiro ciclo',re:'Playbook ativo com time fazendo prospecção autônoma',co:''},
+  {id:'o2t3',t:'Implantar CRM / pipeline de oportunidades',p:'Jul/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Avaliar Maggo vs solução provisória\n2. Configurar pipeline (stages)\n3. Migrar oportunidades existentes\n4. Treinar time',re:'100% das oportunidades registradas no CRM',co:''},
+  {id:'o2t4',t:'Treinar equipe em desenvolvimento de negócios',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Fábio, Leandro',c:'1. Mapear gaps de cada pessoa\n2. Criar programa de treino (3-4 sessões)\n3. Acompanhar por 30 dias',re:'Fábio com autonomia em BD',co:''},
+]},
+{id:'okr3',label:'OKR 3',title:'Construir pipeline de talentos',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar · Recorrente',tasks:[
+  {id:'o3t1',t:'Definir segmentos e níveis prioritários',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Leandro',c:'1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos',re:'Lista de segmentos/níveis prioritários definida',co:''},
+  {id:'o3t2',t:'Estruturar banco de candidatos por vertical',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Definir campos e critérios\n2. Configurar no ATS\n3. Importar base existente',re:'ATS com banco estruturado e candidatos ativos',co:''},
+  {id:'o3t3',t:'Criar processo de atração contínua',p:'Set/26',s:'Bloqueado',a:'Operações',r:'Leandro',c:'1. Definir cadência de sourcing semanal\n2. Criar scripts de abordagem\n3. Meta: X novos candidatos/semana',re:'Processo recorrente ativo sem depender de demanda',co:''},
+  {id:'o3t4',t:'Integrar pipeline ao ATS',p:'Set/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Mapear fluxo candidato → vaga\n2. Configurar automações básicas\n3. Testar e ajustar',re:'Pipeline de talentos integrado ao ATS operacional',co:''},
+]},
+{id:'okr4',label:'OKR 4',title:'Otimizar performance financeira',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar',tasks:[
+  {id:'o4t1',t:'Revisar retirada do sócio vs. resultado retido',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio',c:'1. Apresentar cenário atual (R$50K = 47% folha)\n2. Modelar cenários alternativos\n3. Definir modelo sustentável com Fábio',re:'Retirada ajustada preservando resultado retido',co:''},
+  {id:'o4t2',t:'Mapear margens por tipo de projeto',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fernando',c:'1. Levantar receita e custo por mandato\n2. Calcular margem por tipo\n3. Identificar produtos mais rentáveis',re:'Margem por produto documentada e comparada',co:''},
+  {id:'o4t3',t:'Calcular custo por placement',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Fernando',c:'1. Levantar horas por mandato\n2. Alocar custos fixos\n3. Calcular custo médio por posição preenchida',re:'Custo por placement calculado e documentado',co:''},
+  {id:'o4t4',t:'Criar dashboard financeiro mensal',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Definir KPIs financeiros\n2. Criar planilha/dashboard\n3. Apresentar mensalmente a Fábio',re:'Dashboard mensal ativo com principais indicadores',co:''},
+]},
+{id:'okr5',label:'OKR 5',title:'Expandir possibilidades de receita',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
+  {id:'o5t1',t:'Estruturar oferta People / CHRO as a Service',p:'Set/26',s:'Bloqueado',a:'Comercial',r:'Fábio, Leandro',c:'1. Definir escopo do produto\n2. Precificar (mensal/projeto)\n3. Criar proposta comercial\n4. Testar com 1-2 clientes existentes',re:'Produto CHRO as a Service precificado e proposta criada',co:''},
+  {id:'o5t2',t:'Mapear oportunidades de BPO/Alocação',p:'Set/26',s:'Bloqueado',a:'Comercial',r:'Fábio, Leandro',c:'1. Mapear clientes com demanda de alocação\n2. Definir modelo operacional e comercial\n3. Fazer 3 reuniões comerciais',re:'Primeira oportunidade de BPO identificada e proposta enviada',co:''},
+  {id:'o5t3',t:'Avaliar parceria para expansão EUA',p:'Out/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Mapear parceiros potenciais nos EUA\n2. Avaliar modelo de comissão\n3. Fazer reunião de alinhamento',re:'Parceria definida ou descartada formalmente',co:''},
+]},
+{id:'okr6',label:'OKR 6',title:'Revisar marca e posicionamento',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
+  {id:'o6t1',t:'Revisar posicionamento e practice areas',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Workshop de posicionamento (2h)\n2. Definir 3-4 practice areas\n3. Criar mensagem central',re:'Posicionamento e practice areas definidos e documentados',co:''},
+  {id:'o6t2',t:'Decisão sobre naming (manter "Ocean"?)',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Avaliar força da marca atual\n2. Pesquisar alternativas\n3. Decisão formal',re:'Decisão sobre o nome registrada e comunicada',co:''},
+  {id:'o6t3',t:'Atualizar brand kit e identidade visual',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro',c:'1. Briefing para designer\n2. Revisar logo, paleta, tipografia\n3. Aprovar e exportar arquivos',re:'Brand kit atualizado e distribuído ao time',co:''},
+  {id:'o6t4',t:'Lançar site atualizado (PT + ENG)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. Definir estrutura e textos\n2. Desenvolver com parceiro\n3. Publicar e testar',re:'Site no ar em PT e ENG com novo posicionamento',co:''},
+  {id:'o6t5',t:'Criar materiais institucionais',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. LinkedIn (banners, posts)\n2. Apresentação institucional\n3. Proposta comercial padrão',re:'Kit de materiais pronto para uso comercial',co:''},
+  {id:'o6t6',t:'Geração de autoridade (conteúdo)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Fábio, Leandro',c:'1. Definir temas prioritários\n2. Criar calendário editorial\n3. Publicar 2-3 posts/semana',re:'Calendário editorial ativo com primeiros 30 dias programados',co:''},
+]},
+];
+
+let data, filterStatus='all', filterResp='all';
+const collapsed={}, expanded={};
+let dragIdx=null, dragGid=null, dragSrc=null;
+
+function load(){
+  try{const s=localStorage.getItem('ocean_rdm_v6');data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEF));}
+  catch(e){data=JSON.parse(JSON.stringify(DEF));}
+}
+function save(){
+  localStorage.setItem('ocean_rdm_v6',JSON.stringify(data));
+  const el=document.getElementById('rdm-saved');
+  if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2000);}
+}
+window.rdmStatus=function(gid,tid,sel){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
+  t.s=sel.value;save();updateSummary();updateProg(gid);
+  sel.className='stsel '+(SC[sel.value]||'s-iniciar');
+};
+window.rdmCell=function(gid,tid,field,el){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
+  const val=el.textContent.trim();t[field]=val;
+  el.classList.toggle('ce-empty',!val);save();
+};
+window.rdmMonth=function(gid,tid,field,sel){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
+  t[field]=sel.value;save();
+  if(field==='p'){const td=sel.closest('td');if(td)td.className=monthCls(sel.value);}
+};
+window.rdmExpCell=function(gid,tid,field,el){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const t=g.tasks.find(x=>x.id===tid);if(!t)return;
+  t[field]=el.value;save();
+};
+window.rdmAdd=function(gid){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  g.tasks.push({id:gid+'_'+Date.now(),t:'Nova tarefa',p:'',s:'Iniciar',a:'',r:'',c:'',re:'',co:''});
+  save();render();
+};
+window.rdmDel=function(gid,tid){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  if(!confirm('Remover esta tarefa?'))return;
+  g.tasks=g.tasks.filter(x=>x.id!==tid);save();render();
+};
+window.rdmToggle=function(gid){
+  collapsed[gid]=!collapsed[gid];
+  const c=document.getElementById('rdm-c-'+gid);
+  const ch=document.getElementById('rdm-ch-'+gid);
+  if(c)c.style.display=collapsed[gid]?'none':'';
+  if(ch)ch.textContent=collapsed[gid]?'▸':'▾';
+};
+window.rdmExpand=function(gid,tid){
+  const key=gid+':'+tid;
+  expanded[key]=!expanded[key];
+  const row=document.getElementById('rdm-exp-'+key);
+  const btn=document.getElementById('rdm-expbtn-'+key);
+  if(row)row.style.display=expanded[key]?'':'none';
+  if(btn)btn.textContent=expanded[key]?'▾':'▸';
+};
+// Multi-select responsável — overlay único no body
+let _rKey=null,_rGid=null,_rTid=null;
+(function(){
+  const ov=document.createElement('div');
+  ov.id='rdm-resp-overlay';
+  ov.addEventListener('click',function(e){e.stopPropagation();});
+  document.body.appendChild(ov);
+})();
+window.rdmRespOpen=function(e,el,gid,tid,key){
+  e.stopPropagation();
+  const ov=document.getElementById('rdm-resp-overlay');if(!ov)return;
+  if(_rKey===key&&ov.style.display!=='none'){ov.style.display='none';_rKey=null;return;}
+  _rKey=key;_rGid=gid;_rTid=tid;
+  const g=data.find(x=>x.id===gid),t=g&&g.tasks.find(x=>x.id===tid);if(!t)return;
+  ov.innerHTML=RESP.map(r=>'<label><input type="checkbox" value="'+r+'" '+(((t.r||'').split(', ').indexOf(r)>-1)?'checked':'')+'>'+' '+r+'</label>').join('');
+  ov.querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      const g2=data.find(x=>x.id===_rGid),t2=g2&&g2.tasks.find(x=>x.id===_rTid);if(!t2)return;
+      t2.r=Array.from(ov.querySelectorAll('input:checked')).map(function(i){return i.value;}).join(', ');
+      save();
+      const disp=document.getElementById('rdm-resp-disp-'+_rKey);
+      if(disp){disp.textContent=t2.r||'—';disp.className='rdm-resp-display'+(t2.r?'':' empty');}
+    });
+  });
+  const r=el.getBoundingClientRect();
+  ov.style.top=(r.bottom+4)+'px';
+  ov.style.left=r.left+'px';
+  ov.style.display='block';
+};
+document.addEventListener('click',function(){
+  const ov=document.getElementById('rdm-resp-overlay');
+  if(ov){ov.style.display='none';}
+  _rKey=null;
+});
+// Drag
+window.rdmDragStart=function(e,gid,idx){
+  dragGid=gid;dragIdx=idx;dragSrc=e.currentTarget;
+  e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>{if(dragSrc)dragSrc.style.opacity='.4';},0);
+};
+window.rdmDragEnd=function(){
+  if(dragSrc)dragSrc.style.opacity='';
+  document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  dragSrc=null;
+};
+window.rdmDragOver=function(e,gid,idx){
+  e.preventDefault();if(dragGid!==gid)return;
+  document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  e.currentTarget.classList.add('drag-over');
+};
+window.rdmDrop=function(e,gid,idx){
+  e.preventDefault();
+  document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(dragGid!==gid||dragIdx===null||dragIdx===idx)return;
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const [moved]=g.tasks.splice(dragIdx,1);
+  g.tasks.splice(idx,0,moved);
+  dragIdx=null;save();render();
+};
+
+function stOpts(cur){return SS.map(s=>`<option value="${s}"${s===cur?' selected':''}>${s}</option>`).join('');}
+
+function renderGroup(g){
+  const base=filterStatus==='all'?g.tasks:g.tasks.filter(t=>t.s===filterStatus);
+  const vis=filterResp==='all'?base:base.filter(t=>(t.r||'').includes(filterResp));
+  const total=g.tasks.length,done=g.tasks.filter(t=>t.s==='Feito').length;
+  const pct=total?Math.round(done/total*100):0;
+  const c=COL[g.color]||'#888';
+
+  const rows=vis.map(t=>{
+    const globalIdx=g.tasks.indexOf(t);
+    const key=g.id+':'+t.id;
+    const isExp=!!expanded[key];
+    const sc=SC[t.s]||'s-iniciar';
+    const mc=monthCls(t.p);
+    return `<tr class="rdm-data-row" draggable="true"
+        ondragstart="rdmDragStart(event,'${g.id}',${globalIdx})"
+        ondragend="rdmDragEnd()"
+        ondragover="rdmDragOver(event,'${g.id}',${globalIdx})"
+        ondrop="rdmDrop(event,'${g.id}',${globalIdx})">
+      <td style="text-align:center;"><span class="rdm-drag">⠿</span></td>
+      <td><button class="rdm-del" onclick="rdmDel('${g.id}','${t.id}')">✕</button></td>
+      <td contenteditable="true" data-ph="Tarefa..." class="${!t.t?'ce-empty':''}"
+          onblur="rdmCell('${g.id}','${t.id}','t',this)">${t.t}</td>
+      <td contenteditable="true" data-ph="Área" class="${!t.a?'ce-empty':''}"
+          onblur="rdmCell('${g.id}','${t.id}','a',this)">${t.a}</td>
+      <td><select class="stsel ${sc}" onchange="rdmStatus('${g.id}','${t.id}',this)">${stOpts(t.s)}</select></td>
+      <td class="rdm-resp-cell">
+        <div class="rdm-resp-trigger" onclick="rdmRespOpen(event,this,'${g.id}','${t.id}','${key}')">
+          <span class="rdm-resp-display${t.r?'':' empty'}" id="rdm-resp-disp-${key}">${t.r||'—'}</span>
+          <span class="rdm-resp-arrow">▾</span>
+        </div>
+      </td>
+      <td class="${mc}"><select class="rdm-month-sel" onchange="rdmMonth('${g.id}','${t.id}','p',this)">${monthOpts(t.p)}</select></td>
+      <td class="${conclusaoCls(t.co,t.p)}"><select class="rdm-month-sel" onchange="rdmMonth('${g.id}','${t.id}','co',this)">${monthOpts(t.co)}</select></td>
+      <td style="text-align:center;"><button class="rdm-exp-btn" id="rdm-expbtn-${key}" onclick="rdmExpand('${g.id}','${t.id}')">${isExp?'▾':'▸'}</button></td>
+    </tr>
+    <tr class="rdm-expand-row" id="rdm-exp-${key}" style="display:${isExp?'':'none'};">
+      <td colspan="9">
+        <div class="rdm-expand-inner">
+          <div>
+            <div class="rdm-expand-label">⚙ Como executar</div>
+            <textarea class="rdm-expand-field" placeholder="Passo a passo..." rows="4" onblur="rdmExpCell('${g.id}','${t.id}','c',this)">${t.c||''}</textarea>
+          </div>
+          <div>
+            <div class="rdm-expand-label">✓ Resultado</div>
+            <textarea class="rdm-expand-field" placeholder="O que será alcançado..." rows="4" onblur="rdmExpCell('${g.id}','${t.id}','re',this)">${t.re||''}</textarea>
+          </div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="rdm-group" id="rdm-g-${g.id}">
+    <div class="rdm-gh" onclick="rdmToggle('${g.id}')">
+      <span class="rdm-badge" style="background:${g.colorL};color:${c};">${g.label}</span>
+      <span class="rdm-gtitle">${g.title}</span>
+      ${g.horizonte?`<span class="rdm-horiz">${g.horizonte}</span>`:''}
+      <div class="rdm-gprog">
+        <div class="rdm-gpb"><div class="rdm-gpf" id="rdm-pf-${g.id}" style="width:${pct}%;background:${c};"></div></div>
+        <span class="rdm-gpct" id="rdm-pct-${g.id}">${pct}%</span>
+      </div>
+      <span class="rdm-chev" id="rdm-ch-${g.id}">▾</span>
+    </div>
+    <div id="rdm-c-${g.id}">
+      ${vis.length>0?`<div class="rdm-tbl-wrap"><table class="rdm-tbl">
+        <colgroup><col/><col/><col/><col/><col/><col/><col/><col/><col/></colgroup>
+        <thead><tr><th></th><th></th><th>Tarefa</th><th>Área</th><th>Status</th><th>Responsável</th><th>Prazo</th><th>Conclusão</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`:`<div style="padding:14px 18px;color:var(--g400);font-size:12px;">Nenhuma tarefa com este filtro.</div>`}
+      <button class="rdm-add" onclick="rdmAdd('${g.id}')">+ Adicionar tarefa</button>
+    </div>
+  </div>`;
+}
+
+function updateProg(gid){
+  const g=data.find(x=>x.id===gid);if(!g)return;
+  const total=g.tasks.length,done=g.tasks.filter(t=>t.s==='Feito').length;
+  const pct=total?Math.round(done/total*100):0;
+  const pf=document.getElementById('rdm-pf-'+gid),pc=document.getElementById('rdm-pct-'+gid);
+  if(pf)pf.style.width=pct+'%';if(pc)pc.textContent=pct+'%';
+}
+function updateSummary(){
+  const all=data.flatMap(g=>g.tasks);
+  const cnt={};SS.forEach(s=>cnt[s]=0);all.forEach(t=>{if(cnt[t.s]!==undefined)cnt[t.s]++;});
+  const vencidas=all.filter(t=>t.s!=='Feito'&&monthCls(t.p)==='prazo-vencido').length;
+  const total=all.length,done=cnt['Feito'];
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('rdm-summary').innerHTML=`
+    <div class="rsc"><div class="rv">${total}</div><div class="rl">Total</div></div>
+    <div class="rsc"><div class="rv" style="color:#1a7a4a;">${done}</div><div class="rl">Feito</div></div>
+    <div class="rsc"><div class="rv" style="color:#8a6800;">${cnt['Em andamento']}</div><div class="rl">Em andamento</div></div>
+    <div class="rsc"><div class="rv" style="color:#b71a1a;">${cnt['Iniciar']}</div><div class="rl">A iniciar</div></div>
+    <div class="rsc"><div class="rv" style="color:#6b2db7;">${cnt['Bloqueado']}</div><div class="rl">Bloqueado</div></div>
+    ${vencidas>0?`<div class="rsc"><div class="rv" style="color:#b71a1a;">${vencidas}</div><div class="rl">Vencidas</div></div>`:''}
+    <div class="rsc rc-prog"><div style="font-size:11px;font-weight:700;color:var(--navy);">${pct}% concluído</div><div class="rdm-pbo"><div class="rdm-pbi" style="width:${pct}%;"></div></div></div>`;
+}
+function render(){
+  document.getElementById('rdm-body').innerHTML=data.map(renderGroup).join('');
+  updateSummary();
+}
+
+// Filter dropdown
+function rdmFltUpdateBadge(){
+  const active=(filterStatus!=='all'?1:0)+(filterResp!=='all'?1:0);
+  const badge=document.getElementById('rdm-flt-badge');
+  const btn=document.getElementById('rdm-filter-btn');
+  if(badge){badge.textContent=active;badge.style.display=active?'':'none';}
+  if(btn)btn.classList.toggle('active-filter',active>0);
+}
+window.rdmFltStatus=function(el,val){
+  document.querySelectorAll('#rdm-flt-status .rdm-flt-opt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');filterStatus=val;render();rdmFltUpdateBadge();
+};
+window.rdmFltResp=function(el,val){
+  el.closest('.rdm-flt-opts').querySelectorAll('.rdm-flt-opt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');filterResp=val;render();rdmFltUpdateBadge();
+};
+window.rdmFilterToggle=function(e,btn){
+  e.stopPropagation();
+  const dd=document.getElementById('rdm-filter-dd');if(!dd)return;
+  const open=dd.style.display!=='none';
+  dd.style.display='none';
+  if(!open){const r=btn.getBoundingClientRect();dd.style.top=(r.bottom+4)+'px';dd.style.left=r.left+'px';dd.style.display='block';}
+};
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#rdm-filter-btn')&&!e.target.closest('#rdm-filter-dd')){
+    const dd=document.getElementById('rdm-filter-dd');if(dd)dd.style.display='none';
+  }
+});
+
+load();render();
+})();
+</script>
+</div>
+
+</div>
+
+<div id="page-whiteboard" style="display:none;flex-direction:column;height:calc(100vh - 48px);background:#f0f0f5;overflow:hidden;">
+
+  <!-- Toolbar -->
+  <div id="wb-toolbar" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid #e5e5ea;flex-wrap:wrap;flex-shrink:0;">
+
+    <!-- Tools -->
+    <div style="display:flex;gap:4px;">
+      <button class="wb-tool-btn active" data-tool="pen"    onclick="wbSetTool('pen')"    title="Caneta"   style="font-size:16px;">✏️</button>
+      <button class="wb-tool-btn"        data-tool="eraser" onclick="wbSetTool('eraser')" title="Borracha" style="padding:6px 8px;"><svg width="18" height="13" viewBox="0 0 18 13" style="display:block"><rect x="0" y="0" width="18" height="13" rx="2.5" fill="#FFB3BA" stroke="#e57373" stroke-width="1.2"/><rect x="8" y="0" width="10" height="13" rx="0" fill="#F5F5F5" stroke="#BDBDBD" stroke-width="1.2"/><line x1="8" y1="0" x2="8" y2="13" stroke="#ddd" stroke-width="1"/></svg></button>
+      <button class="wb-tool-btn"        data-tool="rect"   onclick="wbSetTool('rect')"   title="Retângulo" style="font-size:15px;">▭</button>
+      <button class="wb-tool-btn"        data-tool="circle" onclick="wbSetTool('circle')" title="Círculo"  style="font-size:15px;">○</button>
+      <button class="wb-tool-btn"        data-tool="arrow"  onclick="wbSetTool('arrow')"  title="Seta"     style="font-size:15px;">→</button>
+      <button class="wb-tool-btn"        data-tool="text"   onclick="wbSetTool('text')"   title="Texto"    style="font-size:15px;font-weight:700;">T</button>
+    </div>
+
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+
+    <!-- Colors -->
+    <div style="display:flex;gap:5px;align-items:center;">
+      <div class="wb-color active" data-color="#1c1c1e" onclick="wbSetColor('#1c1c1e')" style="background:#1c1c1e;"></div>
+      <div class="wb-color" data-color="#ffffff"  onclick="wbSetColor('#ffffff')"  style="background:#fff;border:1.5px solid #ccc!important;"></div>
+      <div class="wb-color" data-color="#c0392b"  onclick="wbSetColor('#c0392b')"  style="background:#c0392b;"></div>
+      <div class="wb-color" data-color="#0071e3"  onclick="wbSetColor('#0071e3')"  style="background:#0071e3;"></div>
+      <div class="wb-color" data-color="#1a7a4a"  onclick="wbSetColor('#1a7a4a')"  style="background:#1a7a4a;"></div>
+      <div class="wb-color" data-color="#f5a623"  onclick="wbSetColor('#f5a623')"  style="background:#f5a623;"></div>
+      <div class="wb-color" data-color="#8e44ad"  onclick="wbSetColor('#8e44ad')"  style="background:#8e44ad;"></div>
+    </div>
+
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+
+    <!-- Size -->
+    <div style="display:flex;gap:5px;align-items:center;">
+      <button class="wb-size-btn active" data-size="2"  onclick="wbSetSize(2)"  title="Fino"   style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;"><span style="width:4px;height:4px;border-radius:50%;background:currentColor;display:block;"></span></button>
+      <button class="wb-size-btn"        data-size="5"  onclick="wbSetSize(5)"  title="Médio"  style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;"><span style="width:8px;height:8px;border-radius:50%;background:currentColor;display:block;"></span></button>
+      <button class="wb-size-btn"        data-size="12" onclick="wbSetSize(12)" title="Grosso" style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;"><span style="width:14px;height:14px;border-radius:50%;background:currentColor;display:block;"></span></button>
+    </div>
+
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+
+    <!-- Actions -->
+    <button class="wb-action-btn" onclick="wbUndo()"   title="Desfazer (Ctrl+Z)">↩ Desfazer</button>
+    <button class="wb-action-btn" onclick="wbClear()"  title="Limpar tudo">🗑 Limpar</button>
+    <button class="wb-action-btn" onclick="wbPasteImg()" title="Colar imagem (ou Ctrl+V)">📋 Imagem</button>
+    <button class="wb-action-btn" onclick="wbExport()" title="Exportar PNG" style="margin-left:auto;">⬇ PNG</button>
+  </div>
+
+  <!-- Canvas area -->
+  <div style="flex:1;overflow:hidden;position:relative;" id="wb-canvas-wrap">
+    <canvas id="wb-canvas" style="display:block;touch-action:none;"></canvas>
+    <input id="wb-text-input" type="text" placeholder="Digite e pressione Enter..."
+      style="position:fixed;display:none;border:2px dashed #0071e3;background:rgba(255,255,255,.96);
+             outline:none;font-family:Inter,sans-serif;font-weight:600;padding:3px 8px;min-width:140px;
+             border-radius:4px;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,.15);" />
+    <!-- Image paste overlay -->
+    <div id="wb-img-overlay" style="position:absolute;display:none;border:2px solid #0071e3;box-shadow:0 0 0 3px rgba(0,113,227,.18);cursor:move;user-select:none;z-index:20;">
+      <img id="wb-img-el" style="width:100%;height:100%;display:block;pointer-events:none;"/>
+      <!-- Action bar inside image -->
+      <div style="position:absolute;top:6px;right:6px;display:flex;gap:4px;z-index:21;">
+        <button onclick="event.stopPropagation();wbImgCommit()" title="Inserir no canvas (Enter)" style="padding:4px 10px;background:#0071e3;color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;opacity:.95;">✓ Inserir</button>
+        <button onclick="event.stopPropagation();wbImgCancel()" title="Cancelar (Esc)" style="padding:4px 8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:5px;font-size:11px;cursor:pointer;font-family:inherit;">✕</button>
+      </div>
+      <!-- Corner resize handles -->
+      <div class="wb-img-handle" data-corner="nw" style="position:absolute;top:-6px;left:-6px;width:13px;height:13px;background:#0071e3;border:2px solid #fff;cursor:nw-resize;border-radius:50%;z-index:21;"></div>
+      <div class="wb-img-handle" data-corner="ne" style="position:absolute;top:-6px;right:-6px;width:13px;height:13px;background:#0071e3;border:2px solid #fff;cursor:ne-resize;border-radius:50%;z-index:21;"></div>
+      <div class="wb-img-handle" data-corner="sw" style="position:absolute;bottom:-6px;left:-6px;width:13px;height:13px;background:#0071e3;border:2px solid #fff;cursor:sw-resize;border-radius:50%;z-index:21;"></div>
+      <div class="wb-img-handle" data-corner="se" style="position:absolute;bottom:-6px;right:-6px;width:13px;height:13px;background:#0071e3;border:2px solid #fff;cursor:se-resize;border-radius:50%;z-index:21;"></div>
+    </div>
+  </div>
+</div>
+
+
+<footer>Ocean Talent Solutions · Diagnóstico Fase 0 · Junho 2026 · Confidencial</footer>
+
+<script>
+// Tab switching
+function showPage(page) {
+  document.getElementById('page-diagnostico').style.display = page === 'diagnostico' ? '' : 'none';
+  document.getElementById('page-roadmap').style.display = page === 'roadmap' ? '' : 'none';
+  document.getElementById('page-whiteboard').style.display = page === 'whiteboard' ? 'flex' : 'none';
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    t.classList.toggle('active',
+      (i===0 && page==='diagnostico')||(i===1 && page==='roadmap')||(i===2 && page==='whiteboard'));
+  });
+  if(page==='whiteboard') wbInit();
+}
+
+// ── Whiteboard ──────────────────────────────────────────────────
+(function(){
+  let tool='pen', wbColor='#1c1c1e', wbSize=2;
+  let drawing=false, startX=0, startY=0, snapshot=null;
+  let history=[], MAX_HIST=30, wbReady=false;
+  let canvas, ctx, textInput;
+  let imgOverlay, imgEl, imgState=null, imgDragActive=false;
+
+  window.wbInit=function(){
+    if(wbReady) return;
+    canvas=document.getElementById('wb-canvas');
+    ctx=canvas.getContext('2d');
+    textInput=document.getElementById('wb-text-input');
+    resizeCanvas(true);
+    window.addEventListener('resize', ()=>resizeCanvas(false));
+    bindEvents();
+    updateCursor();
+    wbImgInit();
+    wbReady=true;
+  };
+
+  function updateCursor(){
+    if(!canvas)return;
+    if(tool==='text'){canvas.style.cursor='text';return;}
     if(tool==='rect'||tool==='circle'||tool==='arrow'){canvas.style.cursor='crosshair';return;}
     const strokeW=tool==='eraser'?wbSize*6:wbSize;
     const r=Math.max(strokeW/2,2);
