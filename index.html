@@ -1873,8 +1873,7 @@ function showPage(page) {
       const items=await navigator.clipboard.read();
       for(const item of items)for(const type of item.types)
         if(type.startsWith('image/')){loadImgBlob(await item.getType(type));return;}
-      alert('Nenhuma imagem no clipboard.
-Use Ctrl+V diretamente.');
+      alert('Nenhuma imagem no clipboard.\nUse Ctrl+V diretamente.');
     }catch(e){alert('Use Ctrl+V para colar imagens.');}
   };
 
@@ -1933,4 +1932,4 @@ Use Ctrl+V diretamente.');
     link.href=canvas.toDataURL('image/png');link.click();
   };
 })();
-</script>
+</script
