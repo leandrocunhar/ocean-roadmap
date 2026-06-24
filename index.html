@@ -197,6 +197,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
   <div class="nav-logo-area"><span class="nav-logo-text">Ocean</span></div>
   <button class="nav-tab active" onclick="showPage('diagnostico')">Diagnóstico</button>
   <button class="nav-tab" onclick="showPage('roadmap')">Roadmap</button>
+  <button class="nav-tab" onclick="showPage('whiteboard')">Whiteboard</button>
 </nav>
 
 <!-- HERO -->
@@ -829,8 +830,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
       <div style="margin-bottom:18px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
           <div style="font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--red);">Horizonte 1 — Resolver</div>
-          <div style="flex:1;height:1px;background:var(--red-l);"></div>
-        </div>
+          <div style="flex:1;height:1px;background:var(--red-l        </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--red);">
             <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 1</div>
@@ -1000,6 +1000,19 @@ td.co-late .rdm-month-sel{color:#b71a1a;font-weight:600;}
 .rdm-flt-opt{border:1px solid var(--g200);background:#fff;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--navy);}
 .rdm-flt-opt:hover{background:var(--g50);}
 .rdm-flt-opt.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── Whiteboard ──────────────────────────────────── */
+.wb-tool-btn{padding:5px 8px;border:1px solid transparent;border-radius:6px;cursor:pointer;background:transparent;font-family:inherit;color:var(--navy);transition:.12s;}
+.wb-tool-btn:hover{background:var(--g100);}
+.wb-tool-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.wb-color{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:.12s;}
+.wb-color:hover{transform:scale(1.15);}
+.wb-color.active{border-color:var(--navy);box-shadow:0 0 0 2px #fff,0 0 0 4px var(--navy);}
+.wb-size-btn{border:1px solid transparent;border-radius:6px;cursor:pointer;background:transparent;color:var(--navy);}
+.wb-size-btn:hover{background:var(--g100);}
+.wb-size-btn.active{background:var(--g200);}
+.wb-action-btn{padding:5px 12px;border:1px solid var(--g200);border-radius:6px;cursor:pointer;background:#fff;font-size:11px;font-weight:600;font-family:inherit;color:var(--navy);transition:.12s;}
+.wb-action-btn:hover{background:var(--g50);}
 </style>
 
 <div class="rdm-top">
@@ -1393,6 +1406,61 @@ load();render();
 
 </div>
 
+<div id="page-whiteboard" style="display:none;flex-direction:column;height:calc(100vh - 48px);background:#f0f0f5;overflow:hidden;">
+
+  <!-- Toolbar -->
+  <div id="wb-toolbar" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid #e5e5ea;flex-wrap:wrap;flex-shrink:0;">
+
+    <!-- Tools -->
+    <div style="display:flex;gap:4px;">
+      <button class="wb-tool-btn active" data-tool="pen"    onclick="wbSetTool('pen')"    title="Caneta"   style="font-size:16px;">✏️</button>
+      <button class="wb-tool-btn"        data-tool="eraser" onclick="wbSetTool('eraser')" title="Borracha" style="font-size:16px;">🧹</button>
+      <button class="wb-tool-btn"        data-tool="rect"   onclick="wbSetTool('rect')"   title="Retângulo" style="font-size:15px;">▭</button>
+      <button class="wb-tool-btn"        data-tool="circle" onclick="wbSetTool('circle')" title="Círculo"  style="font-size:15px;">○</button>
+      <button class="wb-tool-btn"        data-tool="arrow"  onclick="wbSetTool('arrow')"  title="Seta"     style="font-size:15px;">→</button>
+      <button class="wb-tool-btn"        data-tool="text"   onclick="wbSetTool('text')"   title="Texto"    style="font-size:15px;font-weight:700;">T</button>
+    </div>
+
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+
+    <!-- Colors -->
+    <div style="display:flex;gap:5px;align-items:center;">
+      <div class="wb-color active" data-color="#1c1c1e" onclick="wbSetColor('#1c1c1e')" style="background:#1c1c1e;"></div>
+      <div class="wb-color" data-color="#ffffff"  onclick="wbSetColor('#ffffff')"  style="background:#fff;border:1.5px solid #ccc!important;"></div>
+      <div class="wb-color" data-color="#c0392b"  onclick="wbSetColor('#c0392b')"  style="background:#c0392b;"></div>
+      <div class="wb-color" data-color="#0071e3"  onclick="wbSetColor('#0071e3')"  style="background:#0071e3;"></div>
+      <div class="wb-color" data-color="#1a7a4a"  onclick="wbSetColor('#1a7a4a')"  style="background:#1a7a4a;"></div>
+      <div class="wb-color" data-color="#f5a623"  onclick="wbSetColor('#f5a623')"  style="background:#f5a623;"></div>
+      <div class="wb-color" data-color="#8e44ad"  onclick="wbSetColor('#8e44ad')"  style="background:#8e44ad;"></div>
+    </div>
+
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+
+    <!-- Size -->
+    <div style="display:flex;gap:5px;align-items:center;">
+      <button class="wb-size-btn active" data-size="2"  onclick="wbSetSize(2)"  title="Fino"   style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;"><span style="width:4px;height:4px;border-radius:50%;background:currentColor;display:block;"></span></button>
+      <button class="wb-size-btn"        data-size="5"  onclick="wbSetSize(5)"  title="Médio"  style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;"><span style="width:8px;height:8px;border-radius:50%;background:currentColor;display:block;"></span></button>
+      <button class="wb-size-btn"        data-size="12" onclick="wbSetSize(12)" title="Grosso" style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;"><span style="width:14px;height:14px;border-radius:50%;background:currentColor;display:block;"></span></button>
+    </div>
+
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+
+    <!-- Actions -->
+    <button class="wb-action-btn" onclick="wbUndo()"   title="Desfazer (Ctrl+Z)">↩ Desfazer</button>
+    <button class="wb-action-btn" onclick="wbClear()"  title="Limpar tudo">🗑 Limpar</button>
+    <button class="wb-action-btn" onclick="wbExport()" title="Exportar PNG" style="margin-left:auto;">⬇ PNG</button>
+  </div>
+
+  <!-- Canvas area -->
+  <div style="flex:1;overflow:hidden;position:relative;cursor:crosshair;" id="wb-canvas-wrap">
+    <canvas id="wb-canvas" style="display:block;touch-action:none;"></canvas>
+    <input id="wb-text-input" type="text" placeholder="Digite e pressione Enter..."
+      style="position:absolute;display:none;border:2px dashed #0071e3;background:rgba(255,255,255,.92);
+             outline:none;font-family:Inter,sans-serif;font-weight:600;padding:2px 6px;min-width:120px;border-radius:4px;" />
+  </div>
+</div>
+
+
 <footer>Ocean Talent Solutions · Diagnóstico Fase 0 · Junho 2026 · Confidencial</footer>
 
 <script>
@@ -1400,10 +1468,176 @@ load();render();
 function showPage(page) {
   document.getElementById('page-diagnostico').style.display = page === 'diagnostico' ? '' : 'none';
   document.getElementById('page-roadmap').style.display = page === 'roadmap' ? '' : 'none';
+  document.getElementById('page-whiteboard').style.display = page === 'whiteboard' ? 'flex' : 'none';
   document.querySelectorAll('.nav-tab').forEach((t,i) => {
-    t.classList.toggle('active', (i === 0 && page === 'diagnostico') || (i === 1 && page === 'roadmap'));
+    t.classList.toggle('active',
+      (i===0 && page==='diagnostico')||(i===1 && page==='roadmap')||(i===2 && page==='whiteboard'));
   });
+  if(page==='whiteboard') wbInit();
 }
+
+// ── Whiteboard ──────────────────────────────────────────────────
+(function(){
+  let tool='pen', wbColor='#1c1c1e', wbSize=2;
+  let drawing=false, startX=0, startY=0, snapshot=null;
+  let history=[], MAX_HIST=30, wbReady=false;
+  let canvas, ctx, textInput;
+
+  window.wbInit=function(){
+    if(wbReady) return;
+    canvas=document.getElementById('wb-canvas');
+    ctx=canvas.getContext('2d');
+    textInput=document.getElementById('wb-text-input');
+    resizeCanvas(true);
+    window.addEventListener('resize', ()=>resizeCanvas(false));
+    bindEvents();
+    wbReady=true;
+  };
+
+  function resizeCanvas(load){
+    const wrap=document.getElementById('wb-canvas-wrap');
+    const w=wrap.clientWidth, h=wrap.clientHeight;
+    let saved=null;
+    if(!load && canvas.width>0) saved=canvas.toDataURL();
+    canvas.width=w; canvas.height=h;
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,w,h);
+    if(load){
+      const s=localStorage.getItem('ocean_wb_v1');
+      if(s){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,w,h);img.src=s;}
+    } else if(saved){
+      const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,w,h);img.src=saved;
+    }
+  }
+
+  function saveHistory(){
+    history.push(ctx.getImageData(0,0,canvas.width,canvas.height));
+    if(history.length>MAX_HIST)history.shift();
+    try{localStorage.setItem('ocean_wb_v1',canvas.toDataURL('image/jpeg',.85));}catch(e){}
+  }
+
+  function setCtx(){
+    ctx.strokeStyle=tool==='eraser'?'#ffffff':wbColor;
+    ctx.fillStyle=wbColor;
+    ctx.lineWidth=tool==='eraser'?wbSize*6:wbSize;
+    ctx.lineCap='round'; ctx.lineJoin='round';
+  }
+
+  function drawArrow(x1,y1,x2,y2){
+    const a=Math.atan2(y2-y1,x2-x1), L=Math.max(12,wbSize*3);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-L*Math.cos(a-Math.PI/6),y2-L*Math.sin(a-Math.PI/6));
+    ctx.lineTo(x2-L*Math.cos(a+Math.PI/6),y2-L*Math.sin(a+Math.PI/6));
+    ctx.closePath();ctx.fill();
+  }
+
+  function bindEvents(){
+    canvas.addEventListener('mousedown',function(e){
+      if(tool==='text'){showText(e);return;}
+      drawing=true;
+      const r=canvas.getBoundingClientRect();
+      startX=e.clientX-r.left; startY=e.clientY-r.top;
+      setCtx();
+      if(['rect','circle','arrow'].includes(tool)){
+        snapshot=ctx.getImageData(0,0,canvas.width,canvas.height);
+      } else {
+        saveHistory();
+        ctx.beginPath(); ctx.moveTo(startX,startY);
+      }
+    });
+
+    canvas.addEventListener('mousemove',function(e){
+      if(!drawing)return;
+      const r=canvas.getBoundingClientRect();
+      const x=e.clientX-r.left, y=e.clientY-r.top;
+      if(tool==='pen'||tool==='eraser'){
+        ctx.lineTo(x,y); ctx.stroke();
+      } else if(snapshot){
+        ctx.putImageData(snapshot,0,0); setCtx();
+        if(tool==='rect'){ctx.strokeRect(startX,startY,x-startX,y-startY);}
+        else if(tool==='circle'){
+          ctx.beginPath();
+          ctx.ellipse(startX+(x-startX)/2,startY+(y-startY)/2,Math.abs(x-startX)/2,Math.abs(y-startY)/2,0,0,Math.PI*2);
+          ctx.stroke();
+        } else if(tool==='arrow'){drawArrow(startX,startY,x,y);}
+      }
+    });
+
+    canvas.addEventListener('mouseup',function(){
+      if(!drawing)return; drawing=false;
+      if(['rect','circle','arrow'].includes(tool))saveHistory();
+      snapshot=null;
+    });
+
+    canvas.addEventListener('mouseleave',function(){if(drawing&&(tool==='pen'||tool==='eraser'))drawing=false;});
+
+    // Text
+    textInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();commitText();}});
+    textInput.addEventListener('blur',function(){setTimeout(commitText,100);});
+  }
+
+  function showText(e){
+    const r=canvas.getBoundingClientRect();
+    const x=e.clientX-r.left, y=e.clientY-r.top;
+    textInput.style.left=x+'px'; textInput.style.top=y+'px';
+    textInput.style.fontSize=Math.max(14,wbSize*5)+'px';
+    textInput.style.color=wbColor; textInput.style.display='block';
+    textInput.value=''; textInput.focus();
+  }
+
+  function commitText(){
+    if(textInput.style.display==='none')return;
+    const val=textInput.value.trim();
+    textInput.style.display='none';
+    if(!val)return;
+    saveHistory();
+    const fs=parseInt(textInput.style.fontSize);
+    ctx.fillStyle=wbColor; ctx.font='600 '+fs+'px Inter,-apple-system,sans-serif';
+    ctx.fillText(val,parseInt(textInput.style.left)+4,parseInt(textInput.style.top)+fs);
+    try{localStorage.setItem('ocean_wb_v1',canvas.toDataURL('image/jpeg',.85));}catch(e){}
+  }
+
+  document.addEventListener('keydown',function(e){
+    if(e.ctrlKey&&e.key==='z'){
+      if(!document.getElementById('page-whiteboard')||document.getElementById('page-whiteboard').style.display==='none')return;
+      e.preventDefault(); wbUndo();
+    }
+  });
+
+  window.wbSetTool=function(t){
+    tool=t;
+    document.querySelectorAll('.wb-tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
+    const cursors={pen:'crosshair',eraser:'cell',text:'text',rect:'crosshair',circle:'crosshair',arrow:'crosshair'};
+    if(canvas)canvas.style.cursor=cursors[t]||'crosshair';
+  };
+  window.wbSetColor=function(c){
+    wbColor=c;
+    document.querySelectorAll('.wb-color').forEach(b=>b.classList.toggle('active',b.dataset.color===c));
+  };
+  window.wbSetSize=function(s){
+    wbSize=s;
+    document.querySelectorAll('.wb-size-btn').forEach(b=>b.classList.toggle('active',+b.dataset.size===+s));
+  };
+  window.wbUndo=function(){
+    if(!canvas||history.length===0)return;
+    ctx.putImageData(history.pop(),0,0);
+    try{localStorage.setItem('ocean_wb_v1',canvas.toDataURL('image/jpeg',.85));}catch(e){}
+  };
+  window.wbClear=function(){
+    if(!canvas||!confirm('Apagar tudo no whiteboard?'))return;
+    history=[];
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
+    try{localStorage.removeItem('ocean_wb_v1');}catch(e){}
+  };
+  window.wbExport=function(){
+    if(!canvas)return;
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download='ocean-whiteboard-'+new Date().toISOString().slice(0,10)+'.png';
+    a.click();
+  };
+})();
 
 Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
 Chart.defaults.font.size = 11;
@@ -1414,7 +1648,7 @@ new Chart(document.getElementById('costChart'), {
   data: {
     labels: ['Folha', 'Bônus', 'Overhead'],
     datasets: [{
-      data: [55750, 23639, 19250],
+      data: [55750, 28000, 19250],
       backgroundColor: ['#1c1c1e', '#0071e3', '#98989d'],
       borderWidth: 0, hoverOffset: 4
     }]
