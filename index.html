@@ -200,6 +200,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
   <button class="nav-tab" onclick="showPage('whiteboard')">Whiteboard</button>
 </nav>
 
+<div id="page-diagnostico">
 <!-- HERO -->
 <header class="hero">
 
@@ -213,8 +214,6 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
     <div><div class="hm-label">Meta 2027</div><div class="hm-val">R$400–500K/mês</div></div>
   </div>
 </header>
-
-<div id="page-diagnostico">
 <main>
 
 <!-- ===== FINANÇAS ===== -->
@@ -1414,7 +1413,7 @@ load();render();
     <!-- Tools -->
     <div style="display:flex;gap:4px;">
       <button class="wb-tool-btn active" data-tool="pen"    onclick="wbSetTool('pen')"    title="Caneta"   style="font-size:16px;">✏️</button>
-      <button class="wb-tool-btn"        data-tool="eraser" onclick="wbSetTool('eraser')" title="Borracha" style="font-size:16px;">🧹</button>
+      <button class="wb-tool-btn"        data-tool="eraser" onclick="wbSetTool('eraser')" title="Borracha" style="padding:6px 8px;"><svg width="18" height="13" viewBox="0 0 18 13" style="display:block"><rect x="0" y="0" width="18" height="13" rx="2.5" fill="#FFB3BA" stroke="#e57373" stroke-width="1.2"/><rect x="8" y="0" width="10" height="13" rx="0" fill="#F5F5F5" stroke="#BDBDBD" stroke-width="1.2"/><line x1="8" y1="0" x2="8" y2="13" stroke="#ddd" stroke-width="1"/></svg></button>
       <button class="wb-tool-btn"        data-tool="rect"   onclick="wbSetTool('rect')"   title="Retângulo" style="font-size:15px;">▭</button>
       <button class="wb-tool-btn"        data-tool="circle" onclick="wbSetTool('circle')" title="Círculo"  style="font-size:15px;">○</button>
       <button class="wb-tool-btn"        data-tool="arrow"  onclick="wbSetTool('arrow')"  title="Seta"     style="font-size:15px;">→</button>
@@ -1452,11 +1451,12 @@ load();render();
   </div>
 
   <!-- Canvas area -->
-  <div style="flex:1;overflow:hidden;position:relative;cursor:crosshair;" id="wb-canvas-wrap">
+  <div style="flex:1;overflow:hidden;position:relative;" id="wb-canvas-wrap">
     <canvas id="wb-canvas" style="display:block;touch-action:none;"></canvas>
     <input id="wb-text-input" type="text" placeholder="Digite e pressione Enter..."
-      style="position:absolute;display:none;border:2px dashed #0071e3;background:rgba(255,255,255,.92);
-             outline:none;font-family:Inter,sans-serif;font-weight:600;padding:2px 6px;min-width:120px;border-radius:4px;" />
+      style="position:fixed;display:none;border:2px dashed #0071e3;background:rgba(255,255,255,.96);
+             outline:none;font-family:Inter,sans-serif;font-weight:600;padding:3px 8px;min-width:140px;
+             border-radius:4px;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,.15);" />
   </div>
 </div>
 
@@ -1491,8 +1491,31 @@ function showPage(page) {
     resizeCanvas(true);
     window.addEventListener('resize', ()=>resizeCanvas(false));
     bindEvents();
+    updateCursor();
     wbReady=true;
   };
+
+  function updateCursor(){
+    if(!canvas)return;
+    if(tool==='text'){canvas.style.cursor='text';return;}
+    if(tool==='rect'||tool==='circle'||tool==='arrow'){canvas.style.cursor='crosshair';return;}
+    const strokeW=tool==='eraser'?wbSize*6:wbSize;
+    const r=Math.max(strokeW/2,2);
+    const d=Math.ceil(r)+4;
+    const side=d*2;
+    const tmp=document.createElement('canvas');
+    tmp.width=side;tmp.height=side;
+    const cx=tmp.getContext('2d');
+    cx.beginPath();cx.arc(d,d,r,0,Math.PI*2);
+    if(tool==='eraser'){
+      cx.fillStyle='rgba(255,255,255,0.9)';cx.fill();
+      cx.strokeStyle='#888';cx.lineWidth=1.5;cx.stroke();
+    } else {
+      cx.fillStyle=wbColor;cx.fill();
+      cx.strokeStyle='rgba(0,0,0,0.25)';cx.lineWidth=1;cx.stroke();
+    }
+    canvas.style.cursor='url('+tmp.toDataURL()+') '+d+' '+d+', crosshair';
+  }
 
   function resizeCanvas(load){
     const wrap=document.getElementById('wb-canvas-wrap');
@@ -1573,17 +1596,16 @@ function showPage(page) {
     canvas.addEventListener('mouseleave',function(){if(drawing&&(tool==='pen'||tool==='eraser'))drawing=false;});
 
     // Text
+    textInput.addEventListener('mousedown',function(e){e.stopPropagation();});
     textInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();commitText();}});
     textInput.addEventListener('blur',function(){setTimeout(commitText,100);});
   }
 
   function showText(e){
-    const r=canvas.getBoundingClientRect();
-    const x=e.clientX-r.left, y=e.clientY-r.top;
-    textInput.style.left=x+'px'; textInput.style.top=y+'px';
-    textInput.style.fontSize=Math.max(14,wbSize*5)+'px';
+    textInput.style.left=e.clientX+'px'; textInput.style.top=e.clientY+'px';
+    textInput.style.fontSize=Math.max(16,wbSize*5)+'px';
     textInput.style.color=wbColor; textInput.style.display='block';
-    textInput.value=''; textInput.focus();
+    textInput.value=''; setTimeout(function(){textInput.focus();},10);
   }
 
   function commitText(){
@@ -1592,9 +1614,12 @@ function showPage(page) {
     textInput.style.display='none';
     if(!val)return;
     saveHistory();
-    const fs=parseInt(textInput.style.fontSize);
+    const fs=parseInt(textInput.style.fontSize)||18;
+    const r=canvas.getBoundingClientRect();
+    const x=parseFloat(textInput.style.left)-r.left;
+    const y=parseFloat(textInput.style.top)-r.top;
     ctx.fillStyle=wbColor; ctx.font='600 '+fs+'px Inter,-apple-system,sans-serif';
-    ctx.fillText(val,parseInt(textInput.style.left)+4,parseInt(textInput.style.top)+fs);
+    ctx.fillText(val, x+4, y+fs);
     try{localStorage.setItem('ocean_wb_v1',canvas.toDataURL('image/jpeg',.85));}catch(e){}
   }
 
@@ -1608,16 +1633,17 @@ function showPage(page) {
   window.wbSetTool=function(t){
     tool=t;
     document.querySelectorAll('.wb-tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
-    const cursors={pen:'crosshair',eraser:'cell',text:'text',rect:'crosshair',circle:'crosshair',arrow:'crosshair'};
-    if(canvas)canvas.style.cursor=cursors[t]||'crosshair';
+    updateCursor();
   };
   window.wbSetColor=function(c){
     wbColor=c;
     document.querySelectorAll('.wb-color').forEach(b=>b.classList.toggle('active',b.dataset.color===c));
+    updateCursor();
   };
   window.wbSetSize=function(s){
     wbSize=s;
     document.querySelectorAll('.wb-size-btn').forEach(b=>b.classList.toggle('active',+b.dataset.size===+s));
+    updateCursor();
   };
   window.wbUndo=function(){
     if(!canvas||history.length===0)return;
