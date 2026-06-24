@@ -1476,6 +1476,7 @@ load();render();
 </div>
 
 
+
 <footer>Ocean Talent Solutions · Diagnóstico Fase 0 · Junho 2026 · Confidencial</footer>
 
 <script>
@@ -1517,7 +1518,12 @@ function initCostChart() {
     }
   });
 }
-window.addEventListener('DOMContentLoaded', initCostChart);
+// Script runs after DOM is ready — call directly (DOMContentLoaded already fired)
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', initCostChart);
+} else {
+  initCostChart();
+}
 
 // Tab switching
 function showPage(page) {
@@ -1932,4 +1938,4 @@ function showPage(page) {
     link.href=canvas.toDataURL('image/png');link.click();
   };
 })();
-</script
+</script>
