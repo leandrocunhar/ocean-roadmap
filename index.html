@@ -817,23 +817,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
           <div class="pnum">6</div>
           <div>
             <div class="ptitle">Difusão de ideias e iniciativas</div>
-            <div class="pdesc">Muita coisa para resolver ao mesmo tempo. Novos focos surgem sem critérios objetivos de sucesso. Time e Fábio ficam confusos, e os problemas continuam sem resolução.</div>
-            <span class="impact-tag impact-med">🔷 Médio impacto — Foco estratégico</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- RIGHT: OKRs -->
-    <div>
-      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--g500);margin-bottom:14px;">Roadmap</div>
-
-      <!-- Horizonte 1 -->
-      <div style="margin-bottom:18px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <div style="font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--red);">Horizonte 1 — Resolver</div>
-          <div style="flex:1;height:1px;background:var(--red-l        </div>
+            <div class="pdesc">Muita coisa para resolver ao mesmo tempo        </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="background:#fff;border-radius:8px;padding:14px 16px;border:1px solid var(--g200);border-left:3px solid var(--red);">
             <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">OKR 1</div>
@@ -1101,16 +1085,17 @@ function monthOpts(cur){
 
 const DEF=[
 {id:'f0',label:'FASE 0',title:'Estruturação da Parceria',color:'gray',colorL:'#f2f2f7',horizonte:'',tasks:[
-  {id:'f0t1',t:'Organizar acessos',p:'Jun/26',s:'Feito',a:'Tecnologia',r:'Fernando',c:'1. Solicitar acesso às planilhas\n2. Organizar documentos no Drive\n3. Compartilhar diretrizes de R&S',re:'Planilha de controle, organograma e diretrizes R&S disponíveis',co:'Jun/26'},
-  {id:'f0t2',t:'Diagnóstico da operação + Definição de roadmap',p:'Jun/26',s:'Feito',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Levantar dados financeiros e operacionais\n2. Entrevistar Fábio e Fernando\n3. Construir dashboard\n4. Validar diagnóstico',re:'Dashboard Diagnóstico Ocean validado por Fábio e Fernando',co:'Jun/26'},
-  {id:'f0t3',t:'Organizar comunicação (agenda e pautas)',p:'Jun/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir cadência de reuniões\n2. Criar template de pauta\n3. Definir canal oficial (WhatsApp, e-mail)',re:'Agenda semanal ativa com pauta padrão',co:''},
-  {id:'f0t4',t:'Abrir CNPJ Leandro (Advisory)',p:'Jun/26',s:'Iniciar',a:'Jurídico',r:'Leandro',c:'1. Definir natureza jurídica (MEI/SLU)\n2. Registrar na Receita Federal\n3. Obter alvará municipal',re:'CNPJ ativo da Advisory',co:''},
+  {id:'f0t1',t:'Compartilhar acessos',p:'Jun/26',s:'Feito',a:'Tecnologia',r:'Fernando',c:'1. Solicitar acesso às planilhas\n2. Organizar documentos no Drive\n3. Compartilhar diretrizes de R&S',re:'Planilha de controle, organograma e diretrizes R&S disponíveis',co:'Jun/26'},
+  {id:'f0t3',t:'Organizar comunicação (agenda e pautas)',p:'Jun/26',s:'Feito',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir cadência de reuniões\n2. Criar template de pauta\n3. Definir canal oficial (WhatsApp, e-mail)',re:'Agenda semanal ativa com pauta padrão',co:'Jun/26'},
+  {id:'f0t2',t:'Diagnóstico + Estrutura Roadmap',p:'Jun/26',s:'Feito',a:'Governança',r:'Leandro',c:'1. Levantar dados financeiros e operacionais\n2. Entrevistar Fábio e Fernando\n3. Construir dashboard\n4. Validar diagnóstico',re:'Dashboard Diagnóstico Ocean validado por Fábio e Fernando',co:'Jun/26'},
+  {id:'f0t4',t:'Abrir CNPJ Leandro (Advisory)',p:'Jun/26',s:'Em andamento',a:'Jurídico',r:'Leandro, Especialista',c:'1. Definir natureza jurídica (MEI/SLU)\n2. Registrar na Receita Federal\n3. Obter alvará municipal',re:'CNPJ ativo da Advisory',co:''},
   {id:'f0t5',t:'Abrir conta PJ',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Leandro',c:'1. Aguardar CNPJ\n2. Comparar bancos digitais\n3. Abrir conta e ativar',re:'Conta PJ ativa para receber honorários',co:''},
-  {id:'f0t6',t:'Contrato de serviço com Ocean',p:'Jul/26',s:'Iniciar',a:'Jurídico',r:'Leandro, Fábio',c:'1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar',re:'Contrato assinado entre Advisory e Ocean',co:''},
+  {id:'f0t6',t:'Contrato Leandro + Ocean',p:'Jul/26',s:'Bloqueado',a:'Jurídico',r:'Fábio, Fernando, Leandro',c:'1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar',re:'Contrato assinado entre Advisory e Ocean',co:''},
 ]},
 {id:'okr1',label:'OKR 1',title:'Estruturar papéis, processos e contratos',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
-  {id:'o1t1',t:'Redesenhar organograma e papéis',p:'Jul/26',s:'Iniciar',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Mapear funções atuais\n2. Desenhar 3 verticais\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando',re:'Organograma aprovado com papéis e responsabilidades claras',co:''},
-  {id:'o1t2',t:'Revisar e simplificar modelo de remuneração',p:'Jun/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio, Fernando',c:'1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time',re:'Novo modelo simples, justo e compreensível por todos',co:''},
+  {id:'o1t1',t:'Revisar organograma e papéis',p:'Jul/26',s:'Em andamento',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Mapear funções atuais\n2. Desenhar 3 verticais\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando',re:'Organograma aprovado com papéis e responsabilidades claras',co:''},
+  {id:'okr1_1782310331928',t:'Resolver sobre escritório',p:'',s:'Iniciar',a:'Operações',r:'',c:'',re:'',co:''},
+  {id:'o1t2',t:'Revisar e simplificar modelo de remuneração',p:'Jun/26',s:'Bloqueado',a:'Financeiro',r:'Leandro, Fábio, Fernando',c:'1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time',re:'Novo modelo simples, justo e compreensível por todos',co:''},
   {id:'o1t3',t:'Desenhar plano de carreira',p:'Jul/26',s:'Bloqueado',a:'Governança',r:'Leandro, Fábio, Fernando',c:'1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração',re:'Plano de carreira documentado e apresentado ao time',co:''},
   {id:'o1t4',t:'Discutir com equipe e comunicar mudanças',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Fábio',c:'1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar',re:'Time alinhado e comprometido com as mudanças',co:''},
   {id:'o1t5',t:'Formalizar contratos com prestadores',p:'Jul/26',s:'Bloqueado',a:'Jurídico',r:'Fernando, Fábio, Leandro',c:'1. Listar todos os prestadores ativos\n2. Revisar modelo de contrato\n3. Adaptar para cada perfil\n4. Assinar',re:'100% dos prestadores com contrato assinado',co:''},
@@ -1120,20 +1105,19 @@ const DEF=[
 {id:'okr2',label:'OKR 2',title:'Distribuir a geração de negócios',color:'red',colorL:'#fff0ee',horizonte:'Horizonte 1 — Resolver',tasks:[
   {id:'o2t1',t:'Implementar metas e KPIs comerciais',p:'Jul/26',s:'Bloqueado',a:'Operações',r:'Leandro, Fábio',c:'1. Definir KPIs por papel\n2. Criar dashboard de acompanhamento\n3. Revisar semanalmente',re:'KPIs definidos e monitorados por toda a equipe',co:''},
   {id:'o2t2',t:'Criar processo estruturado de prospecção',p:'Jul/26',s:'Bloqueado',a:'Comercial',r:'Leandro, Fábio',c:'1. Mapear mercado-alvo (segmentos/porte)\n2. Criar playbook de BD com scripts\n3. Treinar Fábio\n4. Lançar primeiro ciclo',re:'Playbook ativo com time fazendo prospecção autônoma',co:''},
-  {id:'o2t3',t:'Implantar CRM / pipeline de oportunidades',p:'Jul/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Avaliar Maggo vs solução provisória\n2. Configurar pipeline (stages)\n3. Migrar oportunidades existentes\n4. Treinar time',re:'100% das oportunidades registradas no CRM',co:''},
   {id:'o2t4',t:'Treinar equipe em desenvolvimento de negócios',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Fábio, Leandro',c:'1. Mapear gaps de cada pessoa\n2. Criar programa de treino (3-4 sessões)\n3. Acompanhar por 30 dias',re:'Fábio com autonomia em BD',co:''},
 ]},
 {id:'okr3',label:'OKR 3',title:'Construir pipeline de talentos',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar · Recorrente',tasks:[
-  {id:'o3t1',t:'Definir segmentos e níveis prioritários',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Leandro',c:'1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos',re:'Lista de segmentos/níveis prioritários definida',co:''},
+  {id:'o3t1',t:'Definir perfis target',p:'Ago/26',s:'Bloqueado',a:'Operações',r:'Fábio, Leandro',c:'1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos',re:'Lista de segmentos/níveis prioritários definida',co:''},
   {id:'o3t2',t:'Estruturar banco de candidatos por vertical',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Leandro, Fernando',c:'1. Definir campos e critérios\n2. Configurar no ATS\n3. Importar base existente',re:'ATS com banco estruturado e candidatos ativos',co:''},
   {id:'o3t3',t:'Criar processo de atração contínua',p:'Set/26',s:'Bloqueado',a:'Operações',r:'Leandro',c:'1. Definir cadência de sourcing semanal\n2. Criar scripts de abordagem\n3. Meta: X novos candidatos/semana',re:'Processo recorrente ativo sem depender de demanda',co:''},
   {id:'o3t4',t:'Integrar pipeline ao ATS',p:'Set/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Mapear fluxo candidato → vaga\n2. Configurar automações básicas\n3. Testar e ajustar',re:'Pipeline de talentos integrado ao ATS operacional',co:''},
 ]},
 {id:'okr4',label:'OKR 4',title:'Otimizar performance financeira',color:'orange',colorL:'#fff8ee',horizonte:'Horizonte 2 — Estabilizar',tasks:[
-  {id:'o4t1',t:'Revisar retirada do sócio vs. resultado retido',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fábio',c:'1. Apresentar cenário atual (R$50K = 47% folha)\n2. Modelar cenários alternativos\n3. Definir modelo sustentável com Fábio',re:'Retirada ajustada preservando resultado retido',co:''},
-  {id:'o4t2',t:'Mapear margens por tipo de projeto',p:'Jul/26',s:'Iniciar',a:'Financeiro',r:'Leandro, Fernando',c:'1. Levantar receita e custo por mandato\n2. Calcular margem por tipo\n3. Identificar produtos mais rentáveis',re:'Margem por produto documentada e comparada',co:''},
+  {id:'o4t4',t:'Criar controle financeiro + Dashboard',p:'Ago/26',s:'Iniciar',a:'Finanças',r:'Fernando, Leandro',c:'1. Definir KPIs financeiros\n2. Criar planilha/dashboard\n3. Apresentar mensalmente a Fábio',re:'Dashboard mensal ativo com principais indicadores',co:''},
+  {id:'o4t1',t:'Revisar retirada do sócio vs. resultado retido',p:'Jul/26',s:'Adiado',a:'Financeiro',r:'Leandro, Fábio',c:'1. Apresentar cenário atual (R$50K = 47% folha)\n2. Modelar cenários alternativos\n3. Definir modelo sustentável com Fábio',re:'Retirada ajustada preservando resultado retido',co:''},
+  {id:'o4t2',t:'Mapear margens por tipo de projeto',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Leandro, Fernando',c:'1. Levantar receita e custo por mandato\n2. Calcular margem por tipo\n3. Identificar produtos mais rentáveis',re:'Margem por produto documentada e comparada',co:''},
   {id:'o4t3',t:'Calcular custo por placement',p:'Jul/26',s:'Bloqueado',a:'Financeiro',r:'Fernando',c:'1. Levantar horas por mandato\n2. Alocar custos fixos\n3. Calcular custo médio por posição preenchida',re:'Custo por placement calculado e documentado',co:''},
-  {id:'o4t4',t:'Criar dashboard financeiro mensal',p:'Ago/26',s:'Bloqueado',a:'Tecnologia',r:'Fernando, Leandro',c:'1. Definir KPIs financeiros\n2. Criar planilha/dashboard\n3. Apresentar mensalmente a Fábio',re:'Dashboard mensal ativo com principais indicadores',co:''},
 ]},
 {id:'okr5',label:'OKR 5',title:'Expandir possibilidades de receita',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
   {id:'o5t1',t:'Estruturar oferta People / CHRO as a Service',p:'Set/26',s:'Bloqueado',a:'Comercial',r:'Fábio, Leandro',c:'1. Definir escopo do produto\n2. Precificar (mensal/projeto)\n3. Criar proposta comercial\n4. Testar com 1-2 clientes existentes',re:'Produto CHRO as a Service precificado e proposta criada',co:''},
@@ -1141,9 +1125,6 @@ const DEF=[
   {id:'o5t3',t:'Avaliar parceria para expansão EUA',p:'Out/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Mapear parceiros potenciais nos EUA\n2. Avaliar modelo de comissão\n3. Fazer reunião de alinhamento',re:'Parceria definida ou descartada formalmente',co:''},
 ]},
 {id:'okr6',label:'OKR 6',title:'Revisar marca e posicionamento',color:'blue',colorL:'#eef4ff',horizonte:'Horizonte 3 — Crescer',tasks:[
-  {id:'o6t1',t:'Revisar posicionamento e practice areas',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Workshop de posicionamento (2h)\n2. Definir 3-4 practice areas\n3. Criar mensagem central',re:'Posicionamento e practice areas definidos e documentados',co:''},
-  {id:'o6t2',t:'Decisão sobre naming (manter "Ocean"?)',p:'Set/26',s:'Bloqueado',a:'Governança',r:'Fábio, Leandro',c:'1. Avaliar força da marca atual\n2. Pesquisar alternativas\n3. Decisão formal',re:'Decisão sobre o nome registrada e comunicada',co:''},
-  {id:'o6t3',t:'Atualizar brand kit e identidade visual',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro',c:'1. Briefing para designer\n2. Revisar logo, paleta, tipografia\n3. Aprovar e exportar arquivos',re:'Brand kit atualizado e distribuído ao time',co:''},
   {id:'o6t4',t:'Lançar site atualizado (PT + ENG)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. Definir estrutura e textos\n2. Desenvolver com parceiro\n3. Publicar e testar',re:'Site no ar em PT e ENG com novo posicionamento',co:''},
   {id:'o6t5',t:'Criar materiais institucionais',p:'Set/26',s:'Bloqueado',a:'Marketing',r:'Leandro, Fábio',c:'1. LinkedIn (banners, posts)\n2. Apresentação institucional\n3. Proposta comercial padrão',re:'Kit de materiais pronto para uso comercial',co:''},
   {id:'o6t6',t:'Geração de autoridade (conteúdo)',p:'Out/26',s:'Bloqueado',a:'Marketing',r:'Fábio, Leandro',c:'1. Definir temas prioritários\n2. Criar calendário editorial\n3. Publicar 2-3 posts/semana',re:'Calendário editorial ativo com primeiros 30 dias programados',co:''},
@@ -1452,6 +1433,13 @@ load();render();
     <button class="wb-action-btn" onclick="wbUndo()"   title="Desfazer (Ctrl+Z)">↩ Desfazer</button>
     <button class="wb-action-btn" onclick="wbClear()"  title="Limpar tudo">🗑 Limpar</button>
     <button class="wb-action-btn" onclick="wbPasteImg()" title="Colar imagem (ou Ctrl+V)">📋 Imagem</button>
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+    <button class="wb-action-btn" onclick="wbZoomOut()" title="Afastar (Ctrl+scroll)" style="font-weight:700;padding:3px 10px;">−</button>
+    <span id="wb-zoom-lbl" style="font-size:11px;color:#888;min-width:38px;text-align:center;font-weight:600;">100%</span>
+    <button class="wb-action-btn" onclick="wbZoomIn()"  title="Aproximar (Ctrl+scroll)" style="font-weight:700;padding:3px 10px;">+</button>
+    <button class="wb-action-btn" onclick="wbZoomReset()" title="Resetar visão">⊙</button>
+    <div style="width:1px;height:28px;background:#e5e5ea;margin:0 2px;"></div>
+    <span style="font-size:10px;color:#bbb;white-space:nowrap;">Espaço+drag · Ctrl+scroll</span>
     <button class="wb-action-btn" onclick="wbExport()" title="Exportar PNG" style="margin-left:auto;">⬇ PNG</button>
   </div>
 
@@ -1478,7 +1466,6 @@ load();render();
     </div>
   </div>
 </div>
-
 
 
 <footer>Ocean Talent Solutions · Diagnóstico Fase 0 · Junho 2026 · Confidencial</footer>
@@ -1942,4 +1929,4 @@ function showPage(page) {
     link.href=canvas.toDataURL('image/png');link.click();
   };
 })();
-</script>
+</script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
