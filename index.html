@@ -230,16 +230,16 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
     <div class="kpi">
       <div class="kpi-label">Custo Operacional</div>
       <div class="kpi-val">R$99K</div>
-      <div class="kpi-sub">folha + overhead + bônus</div>
+      <div class="kpi-sub">folha + comissão + admin</div>
     </div>
     <div class="kpi g">
       <div class="kpi-label">Resultado (Líq.)</div>
-      <div class="kpi-val">R$105K</div>
+      <div class="kpi-val">R$106K</div>
       <div class="kpi-sub">antes da retirada do sócio</div>
     </div>
     <div class="kpi g">
       <div class="kpi-label">Margem (Líq.)</div>
-      <div class="kpi-val">51,6%</div>
+      <div class="kpi-val">52,3%</div>
       <div class="kpi-sub">antes da retirada do sócio</div>
     </div>
     <div class="kpi">
@@ -257,14 +257,13 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
         <tbody>
           <tr><td>(+) Faturamento médio</td><td class="val pos">R$ 203.686</td><td class="val">100%</td></tr>
           <tr><td style="padding-left:32px;color:var(--g600);">(-) Folha — colaboradores</td><td class="val neg">− R$ 55.750</td><td class="val neg">27,4%</td></tr>
-          <tr><td style="padding-left:32px;color:var(--g600);">(-) Overhead (escritório, contab., viagens)</td><td class="val neg">− R$ 14.448</td><td class="val neg">7,1%</td></tr>
-          <tr><td style="padding-left:32px;color:var(--g600);">(-) Bônus variável (média real 2026)</td><td class="val neg">− R$ 23.639</td><td class="val neg">11,6%</td></tr>
-          <tr class="sep"><td>(=) Resultado Bruto</td><td class="val">R$ 105.047</td><td class="val">51,6%</td></tr>
+          <tr><td style="padding-left:32px;color:var(--g600);">(-) Comissão (média real 2026)</td><td class="val neg">− R$ 23.639</td><td class="val neg">11,6%</td></tr>
+          <tr><td style="padding-left:32px;color:var(--g600);">(-) Admin (escritório, contab., viagens, plano de saúde)</td><td class="val neg">− R$ 17.807</td><td class="val neg">8,7%</td></tr>
+          <tr class="sep"><td>(=) Resultado Bruto</td><td class="val">R$ 106.490</td><td class="val">52,3%</td></tr>
           <tr class="note" style="border-top:1px solid #e5e5ea;"><td style="padding-left:16px;font-size:12px;font-weight:700;color:#8e8e93;letter-spacing:.04em;text-transform:uppercase;">Remuneração — Fábio (sócio)</td><td></td><td></td></tr>
           <tr class="note"><td style="padding-left:32px;">(-) Retirada do sócio (classificada como salário)</td><td class="val">− R$ 50.000</td><td class="val">24,6%</td></tr>
           <tr class="note"><td style="padding-left:32px;">(-) Pro-labore — Fábio</td><td class="val">− R$ 1.443</td><td class="val">0,7%</td></tr>
-          <tr class="note"><td style="padding-left:32px;">(-) Plano de saúde — Fábio</td><td class="val">− R$ 3.359</td><td class="val">1,6%</td></tr>
-          <tr class="note" style="font-weight:700;border-top:1px solid #e5e5ea;"><td style="padding-left:32px;">Total remuneração Fábio</td><td class="val" style="color:#c0392b;">− R$ 54.802</td><td class="val" style="color:#c0392b;">26,9%</td></tr>
+          <tr class="note" style="font-weight:700;border-top:1px solid #e5e5ea;"><td style="padding-left:32px;">Total remuneração Fábio</td><td class="val" style="color:#c0392b;">− R$ 51.443</td><td class="val" style="color:#c0392b;">25,3%</td></tr>
           <tr class="total"><td>(=) Resultado Retido pela Empresa</td><td class="val">R$ 55.047</td><td class="val">27,0%</td></tr>
         </tbody>
       </table>
@@ -1481,9 +1480,9 @@ function initCostChart() {
   new Chart(el, {
     type: 'doughnut',
     data: {
-      labels: ['Folha colaboradores', 'Bônus variável', 'Overhead', 'Remuneração Fábio'],
+      labels: ['Folha colaboradores', 'Comissão', 'Admin', 'Pro-labore Fábio'],
       datasets: [{
-        data: [55750, 23639, 14448, 4802],
+        data: [55750, 23639, 17807, 1443],
         backgroundColor: ['#0071e3', '#ff9f0a', '#34c759', '#ff3b30'],
         borderWidth: 0,
         hoverOffset: 6
