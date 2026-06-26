@@ -229,7 +229,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
     </div>
     <div class="kpi">
       <div class="kpi-label">Custo Operacional</div>
-      <div class="kpi-val">R$97K</div>
+      <div class="kpi-val">R$98K</div>
       <div class="kpi-sub">folha + comissão + admin</div>
     </div>
     <div class="kpi g">
@@ -239,7 +239,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
     </div>
     <div class="kpi g">
       <div class="kpi-label">Margem (Líq.)</div>
-      <div class="kpi-val">52,3%</div>
+      <div class="kpi-val">51,9%</div>
       <div class="kpi-sub">antes da retirada do sócio</div>
     </div>
     <div class="kpi">
@@ -257,21 +257,21 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
         <tbody>
           <tr><td>(+) Faturamento médio</td><td class="val pos">R$ 203.686</td><td class="val">100%</td></tr>
           <tr><td style="padding-left:32px;color:var(--g600);">(-) Folha — colaboradores</td><td class="val neg">− R$ 55.750</td><td class="val neg">27,4%</td></tr>
-          <tr><td style="padding-left:32px;color:var(--g600);">(-) Comissão (média real 2026)</td><td class="val neg">− R$ 23.639</td><td class="val neg">11,6%</td></tr>
+          <tr><td style="padding-left:32px;color:var(--g600);">(-) Comissão (média real 2026)</td><td class="val neg">− R$ 24.489</td><td class="val neg">12,0%</td></tr>
           <tr><td style="padding-left:32px;color:var(--g600);">(-) Admin (escritório, contab., viagens, plano de saúde)</td><td class="val neg">− R$ 17.807</td><td class="val neg">8,7%</td></tr>
-          <tr class="sep"><td>(=) Resultado Bruto</td><td class="val">R$ 106.490</td><td class="val">52,3%</td></tr>
+          <tr class="sep"><td>(=) Resultado Bruto</td><td class="val">R$ 105.640</td><td class="val">51,9%</td></tr>
           <tr class="note" style="border-top:1px solid #e5e5ea;"><td style="padding-left:16px;font-size:12px;font-weight:700;color:#8e8e93;letter-spacing:.04em;text-transform:uppercase;">Remuneração — Fábio (sócio)</td><td></td><td></td></tr>
           <tr class="note"><td style="padding-left:32px;">(-) Retirada do sócio (classificada como salário)</td><td class="val">− R$ 50.000</td><td class="val">24,6%</td></tr>
           <tr class="note"><td style="padding-left:32px;">(-) Pro-labore — Fábio</td><td class="val">− R$ 1.443</td><td class="val">0,7%</td></tr>
           <tr class="note" style="font-weight:700;border-top:1px solid #e5e5ea;"><td style="padding-left:32px;">Total remuneração Fábio</td><td class="val" style="color:#c0392b;">− R$ 51.443</td><td class="val" style="color:#c0392b;">25,3%</td></tr>
-          <tr class="total"><td>(=) Resultado Retido pela Empresa</td><td class="val">R$ 55.047</td><td class="val">27,0%</td></tr>
+          <tr class="total"><td>(=) Resultado Retido pela Empresa</td><td class="val">R$ 54.197</td><td class="val">26,6%</td></tr>
         </tbody>
       </table>
     </div>
     <div class="costs-card" style="display:flex;flex-direction:column;justify-content:center;">
       <div class="costs-label">Estrutura de Custos</div>
       <canvas id="costChart" height="150"></canvas>
-      <div style="font-size:11px;color:var(--g600);text-align:center;margin-top:8px;font-weight:600;">Total: ~R$ 97K/mês</div>
+      <div style="font-size:11px;color:var(--g600);text-align:center;margin-top:8px;font-weight:600;">Total: ~R$ 98K/mês</div>
     </div>
   </div>
 
@@ -691,7 +691,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--g50);border:1px solid var(--g200);border-radius:7px;">
-          <span style="font-size:11px;color:var(--g600);">Bônus mensal estimado (2026)</span>
+          <span style="font-size:11px;color:var(--g600);">Comissão mensal estimada (2026)</span>
           <span style="font-size:14px;font-weight:800;color:var(--navy);">~R$ 24,5K</span>
         </div>
       </div>
@@ -1486,7 +1486,7 @@ function initCostChart() {
     data: {
       labels: ['Folha colaboradores', 'Comissão', 'Admin'],
       datasets: [{
-        data: [55750, 23639, 17807],
+        data: [55750, 24489, 17807],
         backgroundColor: ['#0071e3', '#ff9f0a', '#34c759'],
         borderWidth: 0,
         hoverOffset: 6
