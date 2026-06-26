@@ -229,7 +229,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
     </div>
     <div class="kpi">
       <div class="kpi-label">Custo Operacional</div>
-      <div class="kpi-val">R$99K</div>
+      <div class="kpi-val">R$97K</div>
       <div class="kpi-sub">folha + comissão + admin</div>
     </div>
     <div class="kpi g">
@@ -271,7 +271,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
     <div class="costs-card" style="display:flex;flex-direction:column;justify-content:center;">
       <div class="costs-label">Estrutura de Custos</div>
       <canvas id="costChart" height="150"></canvas>
-      <div style="font-size:11px;color:var(--g600);text-align:center;margin-top:8px;font-weight:600;">Total: ~R$ 99K/mês</div>
+      <div style="font-size:11px;color:var(--g600);text-align:center;margin-top:8px;font-weight:600;">Total: ~R$ 97K/mês</div>
     </div>
   </div>
 
@@ -692,7 +692,7 @@ footer{background:var(--g100);color:var(--g400);border-top:1px solid var(--g200)
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--g50);border:1px solid var(--g200);border-radius:7px;">
           <span style="font-size:11px;color:var(--g600);">Bônus mensal estimado (2026)</span>
-          <span style="font-size:14px;font-weight:800;color:var(--navy);">~R$ 23,6K</span>
+          <span style="font-size:14px;font-weight:800;color:var(--navy);">~R$ 24,5K</span>
         </div>
       </div>
 
@@ -1480,10 +1480,10 @@ function initCostChart() {
   new Chart(el, {
     type: 'doughnut',
     data: {
-      labels: ['Folha colaboradores', 'Comissão', 'Admin', 'Pro-labore Fábio'],
+      labels: ['Folha colaboradores', 'Comissão', 'Admin'],
       datasets: [{
-        data: [55750, 23639, 17807, 1443],
-        backgroundColor: ['#0071e3', '#ff9f0a', '#34c759', '#ff3b30'],
+        data: [55750, 23639, 17807],
+        backgroundColor: ['#0071e3', '#ff9f0a', '#34c759'],
         borderWidth: 0,
         hoverOffset: 6
       }]
