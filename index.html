@@ -1153,14 +1153,79 @@ let data, filterStatus='all', filterResp='all';
 const collapsed={}, expanded={};
 let dragIdx=null, dragGid=null, dragSrc=null;
 
-function load(){
-  try{const s=localStorage.getItem('ocean_rdm_v6');data=s?JSON.parse(s):JSON.parse(JSON.stringify(DEF));}
-  catch(e){data=JSON.parse(JSON.stringify(DEF));}
+// ── GitHub shared storage ──────────────────────────────────────────────
+const GH_REPO   = 'leandrocunhar/ocean-roadmap';
+const GH_BRANCH = 'main';
+const GH_FILE   = 'roadmap-data.json';
+let   _ghSha    = null; // SHA do arquivo atual no GitHub (necessário para PUT)
+
+function ghToken(){
+  return localStorage.getItem('ocean_gh_pat')||null;
 }
-function save(){
-  localStorage.setItem('ocean_rdm_v6',JSON.stringify(data));
+function ghSetToken(t){
+  localStorage.setItem('ocean_gh_pat', t.trim());
+}
+function ghHeaders(write){
+  const h={'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
+  const tok=ghToken();
+  if(tok) h['Authorization']='token '+tok;
+  return h;
+}
+
+async function load(){
+  try{
+    const url=`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${GH_FILE}?t=${Date.now()}`;
+    const res=await fetch(url);
+    if(res.ok){data=await res.json();return;}
+  }catch(e){}
+  // fallback: DEF embutido
+  data=JSON.parse(JSON.stringify(DEF));
+}
+
+async function save(){
+  // 1) Garantir token
+  if(!ghToken()){
+    const t=prompt('Para salvar de forma compartilhada, cole seu GitHub Personal Access Token (PAT) com permissão de escrita no repo ocean-roadmap.\n\nO token fica salvo só neste navegador.');
+    if(!t){return;}
+    ghSetToken(t);
+  }
+  // Indicador de saving
   const el=document.getElementById('rdm-saved');
-  if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2000);}
+  if(el){el.textContent='Salvando…';}
+  try{
+    // 2) Buscar SHA atual do arquivo
+    const metaRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{headers:ghHeaders()});
+    if(metaRes.ok){const meta=await metaRes.json();_ghSha=meta.sha;}
+    // 3) Encode JSON em base64
+    const jsonStr=JSON.stringify(data,null,2);
+    const b64=btoa(unescape(encodeURIComponent(jsonStr)));
+    const body={message:'Roadmap atualizado',content:b64,branch:GH_BRANCH};
+    if(_ghSha)body.sha=_ghSha;
+    // 4) PUT no GitHub
+    const putRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{
+      method:'PUT',headers:ghHeaders(true),body:JSON.stringify(body)
+    });
+    if(putRes.ok){
+      const r=await putRes.json();
+      _ghSha=r.content&&r.content.sha?r.content.sha:_ghSha;
+      if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
+    }else{
+      const err=await putRes.json().catch(()=>({}));
+      // Token inválido? Limpar e avisar
+      if(putRes.status===401||putRes.status===403){
+        localStorage.removeItem('ocean_gh_pat');
+        if(el){el.textContent='⚠ Token inválido';}
+        alert('Token inválido ou sem permissão. Tente novamente.');
+      }else{
+        throw new Error(err.message||putRes.status);
+      }
+    }
+  }catch(e){
+    // Fallback local
+    try{localStorage.setItem('ocean_rdm_v6',JSON.stringify(data));}catch(_){}
+    if(el){el.textContent='⚠ Erro (salvo local)';}
+    console.error('Erro ao salvar no GitHub:',e);
+  }
 }
 window.rdmStatus=function(gid,tid,sel){
   const g=data.find(x=>x.id===gid);if(!g)return;
@@ -1401,7 +1466,28 @@ document.addEventListener('click',function(e){
   }
 });
 
-load();render();
+load().then(render);
+
+// Auto-refresh: busca dados do GitHub a cada 60s e re-renderiza se houve mudança
+const POLL_INTERVAL = 60000;
+setInterval(async ()=>{
+  // Só atualiza se a aba roadmap estiver visível
+  const pg = document.getElementById('page-roadmap');
+  if(!pg || pg.style.display==='none') return;
+  try{
+    const url=`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${GH_FILE}?t=${Date.now()}`;
+    const res=await fetch(url);
+    if(!res.ok) return;
+    const fresh=await res.json();
+    // Compara por SHA rápido (stringify)
+    if(JSON.stringify(fresh)!==JSON.stringify(data)){
+      data=fresh;
+      render();
+      const el=document.getElementById('rdm-saved');
+      if(el){el.textContent='↻ Atualizado';setTimeout(()=>{if(el)el.textContent='';},2500);}
+    }
+  }catch(e){}
+}, POLL_INTERVAL);
 })();
 </script>
 </div>
