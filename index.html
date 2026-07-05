@@ -1249,38 +1249,54 @@ async function save(){
   const el=document.getElementById('rdm-saved');
   if(el){el.textContent='Salvando…';}
   try{
-    // 2) Buscar SHA atual do arquivo
-    const metaRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{headers:ghHeaders()});
+    // 2) Buscar SHA atual do arquivo (sempre fresh, sem cache)
+    const metaRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
+      headers:ghHeaders(), cache:'no-store'
+    });
     if(metaRes.ok){const meta=await metaRes.json();_ghSha=meta.sha;}
-    // 3) Encode JSON em base64
+    else if(metaRes.status===404){_ghSha=null;} // arquivo ainda não existe → criar
+    // 3) Encode JSON em base64 (UTF-8 safe)
     const jsonStr=JSON.stringify(data,null,2);
     const b64=btoa(unescape(encodeURIComponent(jsonStr)));
-    const body={message:'Roadmap atualizado',content:b64,branch:GH_BRANCH};
-    if(_ghSha)body.sha=_ghSha;
-    // 4) PUT no GitHub
-    const putRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{
-      method:'PUT',headers:ghHeaders(true),body:JSON.stringify(body)
-    });
-    if(putRes.ok){
-      const r=await putRes.json();
-      _ghSha=r.content&&r.content.sha?r.content.sha:_ghSha;
-      if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
-    }else{
-      const err=await putRes.json().catch(()=>({}));
-      // Token inválido? Limpar e avisar
-      if(putRes.status===401||putRes.status===403){
-        localStorage.removeItem('ocean_gh_pat');
-        if(el){el.textContent='⚠ Token inválido';}
-        alert('Token inválido ou sem permissão. Tente novamente.');
+    // 4) Função interna de PUT (com retry automático em caso de 409)
+    async function doPut(sha, attempt){
+      const body={message:'Roadmap atualizado',content:b64,branch:GH_BRANCH};
+      if(sha) body.sha=sha;
+      const putRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{
+        method:'PUT',headers:ghHeaders(true),body:JSON.stringify(body)
+      });
+      if(putRes.ok){
+        const r=await putRes.json();
+        _ghSha=r.content&&r.content.sha?r.content.sha:sha;
+        if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
       }else{
-        throw new Error(err.message||putRes.status);
+        const err=await putRes.json().catch(()=>({}));
+        console.error('[Ocean Roadmap] PUT falhou',putRes.status,err);
+        if(putRes.status===409 && attempt<2){
+          // SHA desatualizado → buscar SHA correto e tentar de novo
+          const r2=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
+            headers:ghHeaders(), cache:'no-store'
+          });
+          if(r2.ok){const m=await r2.json();_ghSha=m.sha;await doPut(_ghSha,attempt+1);}
+          else throw new Error('Não foi possível obter SHA para retry');
+        }else if(putRes.status===401||putRes.status===403){
+          localStorage.removeItem('ocean_gh_pat');
+          if(el){el.textContent='⚠ Token inválido';}
+          alert('Token inválido ou sem permissão ('+putRes.status+'). Edite algo para configurar novamente.');
+          throw new Error('token-invalid');
+        }else{
+          if(el){el.textContent='⚠ Erro '+putRes.status;}
+          alert('Erro ao salvar ('+putRes.status+'): '+(err.message||'verifique o console F12'));
+          throw new Error(err.message||putRes.status);
+        }
       }
     }
+    await doPut(_ghSha, 0);
   }catch(e){
     // Fallback local
     try{localStorage.setItem('ocean_rdm_v6',JSON.stringify(data));}catch(_){}
     if(el){el.textContent='⚠ Erro (salvo local)';}
-    console.error('Erro ao salvar no GitHub:',e);
+    console.error('[Ocean Roadmap] Erro ao salvar no GitHub:',e);
   }
 }
 window.rdmStatus=function(gid,tid,sel){
