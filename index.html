@@ -1173,6 +1173,18 @@ function ghHeaders(write){
 }
 
 async function load(){
+  // ── Migração: se localStorage tiver dados, perguntar antes de sobrescrever ──
+  const localRaw = localStorage.getItem('ocean_rdm_v6');
+  if(localRaw){
+    try{
+      const localData = JSON.parse(localRaw);
+      // Mostra banner de migração ao invés de descartar silenciosamente
+      data = localData;
+      _pendingMigration = true;
+      return; // usa dados locais; banner vai aparecer após render()
+    }catch(e){}
+  }
+  // ── Carga normal do GitHub ──
   try{
     const url=`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${GH_FILE}?t=${Date.now()}`;
     const res=await fetch(url);
@@ -1182,12 +1194,56 @@ async function load(){
   data=JSON.parse(JSON.stringify(DEF));
 }
 
+let _pendingMigration = false;
+
+function showMigrationBanner(){
+  if(!_pendingMigration) return;
+  const existing = document.getElementById('rdm-migration-banner');
+  if(existing) return;
+  const banner = document.createElement('div');
+  banner.id = 'rdm-migration-banner';
+  banner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:16px;font-size:13px;font-family:inherit;max-width:560px;';
+  banner.innerHTML = `
+    <span>⚠️ Você tem dados locais mais recentes que ainda não foram publicados no GitHub.</span>
+    <button onclick="migrateToGitHub()" style="background:#0071e3;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Publicar agora</button>
+    <button onclick="document.getElementById('rdm-migration-banner').remove()" style="background:transparent;color:#aaa;border:1px solid #555;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">Ignorar</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+window.migrateToGitHub = async function(){
+  const banner = document.getElementById('rdm-migration-banner');
+  if(banner) banner.querySelector('button').textContent = 'Publicando…';
+  await save();
+  // Se salvou com sucesso, limpa localStorage
+  const el = document.getElementById('rdm-saved');
+  if(el && el.textContent.includes('✓')){
+    localStorage.removeItem('ocean_rdm_v6');
+    _pendingMigration = false;
+    if(banner) banner.remove();
+  } else {
+    if(banner) banner.querySelector('button').textContent = 'Publicar agora';
+  }
+};
+
 async function save(){
   // 1) Garantir token
   if(!ghToken()){
-    const t=prompt('Para salvar de forma compartilhada, cole seu GitHub Personal Access Token (PAT) com permissão de escrita no repo ocean-roadmap.\n\nO token fica salvo só neste navegador.');
-    if(!t){return;}
-    ghSetToken(t);
+    await new Promise(resolve=>{
+      const overlay=document.createElement('div');
+      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
+      overlay.innerHTML=`<div style="background:#fff;border-radius:16px;padding:32px;max-width:480px;width:90%;font-family:inherit;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+        <h3 style="font-size:17px;font-weight:800;margin-bottom:8px;">Configurar token GitHub</h3>
+        <p style="font-size:13px;color:#6e6e73;margin-bottom:20px;">Para salvar de forma compartilhada com o time, cole seu GitHub Personal Access Token (PAT). Ele fica armazenado só neste navegador.</p>
+        <input id="gh-pat-input" type="password" placeholder="github_pat_..." style="width:100%;padding:10px 14px;border:1px solid #d1d1d6;border-radius:8px;font-size:13px;margin-bottom:16px;box-sizing:border-box;" />
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button onclick="this.closest('div').parentElement.parentElement.remove();resolve();" style="padding:9px 18px;border:1px solid #d1d1d6;border-radius:8px;font-size:13px;cursor:pointer;background:#fff;">Cancelar</button>
+          <button onclick="const v=document.getElementById('gh-pat-input').value.trim();if(!v)return;ghSetToken(v);this.closest('div').parentElement.parentElement.remove();resolve();" style="padding:9px 18px;background:#0071e3;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Salvar token</button>
+        </div>
+      </div>`;
+      document.body.appendChild(overlay);
+    });
+    if(!ghToken()){return;} // cancelou
   }
   // Indicador de saving
   const el=document.getElementById('rdm-saved');
@@ -1466,7 +1522,7 @@ document.addEventListener('click',function(e){
   }
 });
 
-load().then(render);
+load().then(()=>{render();showMigrationBanner();});
 
 // Auto-refresh: busca dados do GitHub a cada 60s e re-renderiza se houve mudança
 const POLL_INTERVAL = 60000;
