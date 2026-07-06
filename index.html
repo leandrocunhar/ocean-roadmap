@@ -1218,6 +1218,8 @@ let _saveLock=false;
 let _savePending=false;
 
 function save(){
+  // Gravar no localStorage imediatamente — protege contra refresh antes do debounce/API
+  try{localStorage.setItem('ocean_rdm_local',JSON.stringify({d:data,t:Date.now()}));}catch(_){}
   const el=document.getElementById('rdm-saved');
   if(el){el.textContent='...';}
   clearTimeout(_saveDebounce);
