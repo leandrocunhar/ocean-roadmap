@@ -55,7 +55,7 @@
         "id": "f0t6",
         "t": "Contrato Leandro + Ocean",
         "p": "Jul/26",
-        "s": "Iniciar",
+        "s": "Bloqueado",
         "a": "Jurídico",
         "r": "Fábio, Fernando, Leandro",
         "c": "1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar",
@@ -211,7 +211,18 @@
         "a": "Operações",
         "r": "Leandro, Fábio",
         "c": "1. Definir KPIs por papel\n2. Criar dashboard de acompanhamento\n3. Revisar semanalmente",
-        "re": "",
+        "re": "KPIs definidos e monitorados por toda a equipe",
+        "co": ""
+      },
+      {
+        "id": "o2t2",
+        "t": "Criar processo estruturado de prospecção",
+        "p": "Jul/26",
+        "s": "Bloqueado",
+        "a": "Comercial",
+        "r": "Leandro, Fábio",
+        "c": "1. Mapear mercado-alvo (segmentos/porte)\n2. Criar playbook de BD com scripts\n3. Treinar Fábio\n4. Lançar primeiro ciclo",
+        "re": "Playbook ativo com time fazendo prospecção autônoma",
         "co": ""
       },
       {
@@ -222,7 +233,7 @@
         "a": "Operações",
         "r": "Fábio, Leandro",
         "c": "1. Mapear gaps de cada pessoa\n2. Criar programa de treino (3-4 sessões)\n3. Acompanhar por 30 dias",
-        "re": "",
+        "re": "Fábio com autonomia em BD",
         "co": ""
       }
     ]
@@ -243,7 +254,7 @@
         "a": "Operações",
         "r": "Fábio, Leandro",
         "c": "1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos",
-        "re": "",
+        "re": "Lista de segmentos/níveis prioritários definida",
         "co": ""
       },
       {
@@ -254,7 +265,7 @@
         "a": "Tecnologia",
         "r": "Leandro, Fernando",
         "c": "1. Definir campos e critérios\n2. Configurar no ATS\n3. Importar base existente",
-        "re": "",
+        "re": "ATS com banco estruturado e candidatos ativos",
         "co": ""
       },
       {
@@ -265,7 +276,7 @@
         "a": "Operações",
         "r": "Leandro",
         "c": "1. Definir cadência de sourcing semanal\n2. Criar scripts de abordagem\n3. Meta: X novos candidatos/semana",
-        "re": "",
+        "re": "Processo recorrente ativo sem depender de demanda",
         "co": ""
       },
       {
@@ -276,7 +287,7 @@
         "a": "Tecnologia",
         "r": "Fernando, Leandro",
         "c": "1. Mapear fluxo candidato → vaga\n2. Configurar automações básicas\n3. Testar e ajustar",
-        "re": "",
+        "re": "Pipeline de talentos integrado ao ATS operacional",
         "co": ""
       }
     ]
