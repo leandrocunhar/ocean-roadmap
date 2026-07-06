@@ -106,6 +106,17 @@
         "co": ""
       },
       {
+        "id": "o1t3",
+        "t": "Desenhar plano de carreira",
+        "p": "Jul/26",
+        "s": "Iniciar",
+        "a": "Governança",
+        "r": "Leandro, Fábio, Fernando",
+        "c": "1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração",
+        "re": "Plano de carreira documentado e apresentado ao time",
+        "co": ""
+      },
+      {
         "id": "o1t4",
         "t": "Discutir com equipe e comunicar mudanças",
         "p": "Jul/26",
@@ -125,17 +136,6 @@
         "r": "Fábio, Leandro, Fernando",
         "c": "1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta\n3. Implementar",
         "re": "Reuniões de gestão ativas com pauta e ata",
-        "co": ""
-      },
-      {
-        "id": "o1t3",
-        "t": "Desenhar plano de carreira",
-        "p": "Jul/26",
-        "s": "Iniciar",
-        "a": "Governança",
-        "r": "Leandro, Fábio, Fernando",
-        "c": "1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração",
-        "re": "Plano de carreira documentado e apresentado ao time",
         "co": ""
       },
       {
