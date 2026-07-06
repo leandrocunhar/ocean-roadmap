@@ -66,7 +66,7 @@
         "id": "f0t6",
         "t": "Contrato Leandro + Ocean",
         "p": "Jul/26",
-        "s": "Bloqueado",
+        "s": "Iniciar",
         "a": "Jurídico",
         "r": "Fábio, Fernando, Leandro",
         "c": "1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar",
@@ -87,7 +87,7 @@
         "id": "o1t1",
         "t": "Revisar organograma e papéis",
         "p": "Jul/26",
-        "s": "Em andamento",
+        "s": "Validar",
         "a": "Governança",
         "r": "Leandro, Fábio, Fernando",
         "c": "1. Mapear funções atuais\n2. Desenhar 3 verticais\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando",
@@ -95,21 +95,10 @@
         "co": ""
       },
       {
-        "id": "okr1_1782310331928",
-        "t": "Resolver sobre escritório",
-        "p": "",
-        "s": "Iniciar",
-        "a": "Operações",
-        "r": "",
-        "c": "",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "o1t2",
         "t": "Revisar e simplificar modelo de remuneração",
         "p": "Jun/26",
-        "s": "Bloqueado",
+        "s": "Validar",
         "a": "Financeiro",
         "r": "Leandro, Fábio, Fernando",
         "c": "1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time",
@@ -117,10 +106,21 @@
         "co": ""
       },
       {
+        "id": "okr1_1782310331928",
+        "t": "Resolver sobre escritório",
+        "p": "",
+        "s": "Adiado",
+        "a": "Operações",
+        "r": "",
+        "c": "",
+        "re": "",
+        "co": ""
+      },
+      {
         "id": "o1t3",
         "t": "Desenhar plano de carreira",
         "p": "Jul/26",
-        "s": "Bloqueado",
+        "s": "Iniciar",
         "a": "Governança",
         "r": "Leandro, Fábio, Fernando",
         "c": "1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração",
@@ -128,10 +128,21 @@
         "co": ""
       },
       {
+        "id": "okr1_avaliacao_equipe",
+        "t": "Avaliação equipe",
+        "a": "RH",
+        "s": "Iniciar",
+        "r": "Leandro",
+        "p": "Jul/26",
+        "co": "",
+        "c": "",
+        "re": ""
+      },
+      {
         "id": "o1t4",
         "t": "Discutir com equipe e comunicar mudanças",
         "p": "Jul/26",
-        "s": "Bloqueado",
+        "s": "Em andamento",
         "a": "Operações",
         "r": "Fábio",
         "c": "1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar",
@@ -153,7 +164,7 @@
         "id": "o1t6",
         "t": "Revisar cadência de reuniões de gestão",
         "p": "Jul/26",
-        "s": "Bloqueado",
+        "s": "Iniciar",
         "a": "Governança",
         "r": "Fábio, Leandro, Fernando",
         "c": "1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta\n3. Implementar",
@@ -181,6 +192,17 @@
     "colorL": "#fff0ee",
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
+      {
+        "id": "okr2_implantar_crm",
+        "t": "Implantar CRM / pipeline de oportunidades",
+        "a": "Tecnologia",
+        "s": "Feito",
+        "r": "IA",
+        "p": "Jun/26",
+        "co": "Jun/26",
+        "c": "",
+        "re": ""
+      },
       {
         "id": "o2t1",
         "t": "Implementar metas e KPIs comerciais",
@@ -279,10 +301,21 @@
     "horizonte": "Horizonte 2 — Estabilizar",
     "tasks": [
       {
+        "id": "okr4_solicitar_cartao",
+        "t": "Solicitar cartão de crédito",
+        "a": "Finanças",
+        "s": "Em andamento",
+        "r": "Fábio, Fernando",
+        "p": "Jul/26",
+        "co": "",
+        "c": "",
+        "re": ""
+      },
+      {
         "id": "o4t4",
         "t": "Criar controle financeiro + Dashboard",
         "p": "Ago/26",
-        "s": "Iniciar",
+        "s": "Em andamento",
         "a": "Finanças",
         "r": "Fernando, Leandro",
         "c": "1. Definir KPIs financeiros\n2. Criar planilha/dashboard\n3. Apresentar mensalmente a Fábio",

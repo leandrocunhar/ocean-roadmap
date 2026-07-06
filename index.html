@@ -1169,6 +1169,11 @@ async function load(){
     const res=await fetch(JBIN_URL+'/latest',{headers:{'X-Master-Key':JBIN_KEY}});
     if(res.ok){const j=await res.json();if(j.record&&j.record.length){data=j.record;return;}}
   }catch(e){console.warn('[Ocean Roadmap] JSONbin load error:',e);}
+  // ── Fallback: roadmap-data.json no GitHub ──
+  try{
+    const res=await fetch('https://raw.githubusercontent.com/leandrocunhar/ocean-roadmap/main/roadmap-data.json?t='+Date.now());
+    if(res.ok){const d=await res.json();if(d&&d.length){data=d;_pendingMigration=true;return;}}
+  }catch(e){console.warn('[Ocean Roadmap] GitHub fallback error:',e);}
   data=JSON.parse(JSON.stringify(DEF));
 }
 
