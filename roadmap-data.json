@@ -52,17 +52,6 @@
         "co": ""
       },
       {
-        "id": "f0t5",
-        "t": "Abrir conta PJ",
-        "p": "Jul/26",
-        "s": "Bloqueado",
-        "a": "Financeiro",
-        "r": "Leandro",
-        "c": "1. Aguardar CNPJ\n2. Comparar bancos digitais\n3. Abrir conta e ativar",
-        "re": "Conta PJ ativa para receber honorários",
-        "co": ""
-      },
-      {
         "id": "f0t6",
         "t": "Contrato Leandro + Ocean",
         "p": "Jul/26",
@@ -71,6 +60,17 @@
         "r": "Fábio, Fernando, Leandro",
         "c": "1. Definir escopo, prazo e honorários\n2. Redigir contrato com IA\n3. Revisar com advogado\n4. Assinar",
         "re": "Contrato assinado entre Advisory e Ocean",
+        "co": ""
+      },
+      {
+        "id": "f0t5",
+        "t": "Abrir conta PJ",
+        "p": "Jul/26",
+        "s": "Bloqueado",
+        "a": "Financeiro",
+        "r": "Leandro",
+        "c": "1. Aguardar CNPJ\n2. Comparar bancos digitais\n3. Abrir conta e ativar",
+        "re": "Conta PJ ativa para receber honorários",
         "co": ""
       }
     ]
