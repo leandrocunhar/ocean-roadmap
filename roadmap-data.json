@@ -87,7 +87,7 @@
         "id": "o1t1",
         "t": "Revisar organograma e papéis",
         "p": "Jul/26",
-        "s": "Validar",
+        "s": "Em andamento",
         "a": "Governança",
         "r": "Leandro, Fábio, Fernando",
         "c": "1. Mapear funções atuais\n2. Desenhar 3 verticais\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando",
@@ -95,25 +95,25 @@
         "co": ""
       },
       {
-        "id": "o1t2",
-        "t": "Revisar e simplificar modelo de remuneração",
-        "p": "Jun/26",
-        "s": "Validar",
-        "a": "Financeiro",
-        "r": "Leandro, Fábio, Fernando",
-        "c": "1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time",
-        "re": "Novo modelo simples, justo e compreensível por todos",
-        "co": ""
-      },
-      {
         "id": "okr1_1782310331928",
-        "t": "Resolver sobre novo escritório",
+        "t": "Resolver sobre escritório",
         "p": "",
-        "s": "Iniciar",
+        "s": "Adiado",
         "a": "Operações",
         "r": "",
         "c": "",
         "re": "",
+        "co": ""
+      },
+      {
+        "id": "o1t2",
+        "t": "Revisar e simplificar modelo de remuneração",
+        "p": "Jun/26",
+        "s": "Bloqueado",
+        "a": "Financeiro",
+        "r": "Leandro, Fábio, Fernando",
+        "c": "1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time",
+        "re": "Novo modelo simples, justo e compreensível por todos",
         "co": ""
       },
       {
@@ -169,28 +169,6 @@
         "r": "Leandro, Fernando",
         "c": "1. Mapear necessidades\n2. Avaliar Maggo vs planilha\n3. Configurar e treinar time",
         "re": "Sistema ativo com todos os contratos cadastrados",
-        "co": ""
-      },
-      {
-        "id": "okr1_1783296569809",
-        "t": "teste 4",
-        "p": "Jul/26",
-        "s": "Em andamento",
-        "a": "area",
-        "r": "Leandro",
-        "c": "",
-        "re": "",
-        "co": ""
-      },
-      {
-        "id": "okr1_1783296606365",
-        "t": "teste 5",
-        "p": "Ago/26",
-        "s": "Adiado",
-        "a": "area",
-        "r": "Fernando",
-        "c": "",
-        "re": "",
         "co": ""
       }
     ]
