@@ -211,7 +211,18 @@
         "a": "Operações",
         "r": "Leandro, Fábio",
         "c": "1. Definir KPIs por papel\n2. Criar dashboard de acompanhamento\n3. Revisar semanalmente",
-        "re": "",
+        "re": "KPIs definidos e monitorados por toda a equipe",
+        "co": ""
+      },
+      {
+        "id": "o2t2",
+        "t": "Criar processo estruturado de prospecção",
+        "p": "Jul/26",
+        "s": "Bloqueado",
+        "a": "Comercial",
+        "r": "Leandro, Fábio",
+        "c": "1. Mapear mercado-alvo (segmentos/porte)\n2. Criar playbook de BD com scripts\n3. Treinar Fábio\n4. Lançar primeiro ciclo",
+        "re": "Playbook ativo com time fazendo prospecção autônoma",
         "co": ""
       },
       {
@@ -222,7 +233,7 @@
         "a": "Operações",
         "r": "Fábio, Leandro",
         "c": "1. Mapear gaps de cada pessoa\n2. Criar programa de treino (3-4 sessões)\n3. Acompanhar por 30 dias",
-        "re": "",
+        "re": "Fábio com autonomia em BD",
         "co": ""
       }
     ]
@@ -243,7 +254,7 @@
         "a": "Operações",
         "r": "Fábio, Leandro",
         "c": "1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos",
-        "re": "",
+        "re": "Lista de segmentos/níveis prioritários definida",
         "co": ""
       },
       {
