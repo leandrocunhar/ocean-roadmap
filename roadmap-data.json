@@ -216,7 +216,7 @@
       },
       {
         "id": "o2t2",
-        "t": "Organizar prospecção",
+        "t": "Criar processo estruturado de prospecção",
         "p": "Jul/26",
         "s": "Bloqueado",
         "a": "Comercial",
@@ -248,7 +248,7 @@
     "tasks": [
       {
         "id": "o3t1",
-        "t": "Mapear novos nomes",
+        "t": "Definir perfis target",
         "p": "Ago/26",
         "s": "Bloqueado",
         "a": "Operações",
