@@ -1168,7 +1168,7 @@ function ghSetToken(t){
 function ghHeaders(write){
   const h={'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
   const tok=ghToken();
-  if(tok) h['Authorization']='token '+tok;
+  if(tok) h['Authorization']='Bearer '+tok;
   return h;
 }
 
@@ -1257,12 +1257,42 @@ async function _performSave(){
   const el=document.getElementById('rdm-saved');
   if(el){el.textContent='Salvando…';}
   try{
-    // 2) Buscar SHA atual do arquivo (sempre fresh, sem cache)
-    const metaRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
-      headers:ghHeaders(), cache:'no-store'
-    });
-    if(metaRes.ok){const meta=await metaRes.json();_ghSha=meta.sha;}
-    else if(metaRes.status===404){_ghSha=null;} // arquivo ainda não existe → criar
+    // 2) Buscar SHA atual via Git Refs API (não tem cache server-side)
+    async function fetchFreshSha(){
+      try{
+        // Pega o commit HEAD do branch
+        const refRes=await fetch(`https://api.github.com/repos/${GH_REPO}/git/ref/heads/${GH_BRANCH}`,{
+          headers:ghHeaders(),cache:'reload'
+        });
+        if(!refRes.ok) throw new Error('ref fetch '+refRes.status);
+        const ref=await refRes.json();
+        const commitSha=ref.object.sha;
+        // Pega a árvore do commit (recursive para arquivos na raiz)
+        const treeRes=await fetch(`https://api.github.com/repos/${GH_REPO}/git/commits/${commitSha}`,{
+          headers:ghHeaders(),cache:'reload'
+        });
+        if(!treeRes.ok) throw new Error('commit fetch '+treeRes.status);
+        const commit=await treeRes.json();
+        const treeRes2=await fetch(`https://api.github.com/repos/${GH_REPO}/git/trees/${commit.tree.sha}`,{
+          headers:ghHeaders(),cache:'reload'
+        });
+        if(!treeRes2.ok) throw new Error('tree fetch '+treeRes2.status);
+        const tree=await treeRes2.json();
+        const fileNode=tree.tree.find(f=>f.path===GH_FILE);
+        console.log('[Ocean Roadmap] SHA via Refs API:',fileNode?fileNode.sha:'null (arquivo novo)');
+        return fileNode?fileNode.sha:null;
+      }catch(err2){
+        console.warn('[Ocean Roadmap] Refs API falhou, tentando Contents API:',err2);
+        // Fallback: Contents API com cache bust
+        const r=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
+          headers:{...ghHeaders(),'Cache-Control':'no-cache'},cache:'reload'
+        });
+        if(r.ok){const m=await r.json();return m.sha;}
+        if(r.status===404) return null;
+        return _ghSha;
+      }
+    }
+    _ghSha=await fetchFreshSha();
     // 3) Encode JSON em base64 (UTF-8 safe)
     const jsonStr=JSON.stringify(data,null,2);
     const b64=btoa(unescape(encodeURIComponent(jsonStr)));
@@ -1282,11 +1312,12 @@ async function _performSave(){
         const err=await putRes.json().catch(()=>({}));
         console.error('[Ocean Roadmap] PUT falhou',putRes.status,err);
         if(putRes.status===409 && attempt<2){
-          // SHA desatualizado → extrair SHA correto direto da mensagem de erro e retry
-          const shFromMsg=(err.message||'').match(/[0-9a-f]{40}/)?.[0];
-          console.log('[Ocean Roadmap] 409 retry com SHA do erro:',shFromMsg);
-          if(shFromMsg){_ghSha=shFromMsg;await doPut(shFromMsg,attempt+1);}
-          else throw new Error('Não foi possível extrair SHA para retry');
+          // SHA desatualizado → buscar SHA fresco via Refs API e retry
+          console.log('[Ocean Roadmap] 409 → buscando SHA fresco para retry...');
+          const freshSha=await fetchFreshSha();
+          console.log('[Ocean Roadmap] SHA fresco para retry:',freshSha);
+          if(freshSha!==null){_ghSha=freshSha;await doPut(freshSha,attempt+1);}
+          else throw new Error('Não foi possível obter SHA para retry');
         }else if(putRes.status===401||putRes.status===403){
           localStorage.removeItem('ocean_gh_pat');
           if(el){el.textContent='⚠ Token inválido';}
