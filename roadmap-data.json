@@ -332,28 +332,6 @@
         "c": "1. Apresentar cenário atual (R$50K = 47% folha)\n2. Modelar cenários alternativos\n3. Definir modelo sustentável com Fábio",
         "re": "Retirada ajustada preservando resultado retido",
         "co": ""
-      },
-      {
-        "id": "o4t2",
-        "t": "Mapear margens por tipo de projeto",
-        "p": "Jul/26",
-        "s": "Bloqueado",
-        "a": "Financeiro",
-        "r": "Leandro, Fernando",
-        "c": "1. Levantar receita e custo por mandato\n2. Calcular margem por tipo\n3. Identificar produtos mais rentáveis",
-        "re": "Margem por produto documentada e comparada",
-        "co": ""
-      },
-      {
-        "id": "o4t3",
-        "t": "Calcular custo por placement",
-        "p": "Jul/26",
-        "s": "Bloqueado",
-        "a": "Financeiro",
-        "r": "Fernando",
-        "c": "1. Levantar horas por mandato\n2. Alocar custos fixos\n3. Calcular custo médio por posição preenchida",
-        "re": "Custo por placement calculado e documentado",
-        "co": ""
       }
     ]
   },
