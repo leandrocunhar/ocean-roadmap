@@ -106,17 +106,6 @@
         "co": ""
       },
       {
-        "id": "okr1_1782310331928",
-        "t": "Resolver sobre escritório",
-        "p": "",
-        "s": "Adiado",
-        "a": "Operações",
-        "r": "",
-        "c": "",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "o1t3",
         "t": "Desenhar plano de carreira",
         "p": "Jul/26",
@@ -147,6 +136,17 @@
         "r": "Fábio",
         "c": "1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar",
         "re": "Time alinhado e comprometido com as mudanças",
+        "co": ""
+      },
+      {
+        "id": "okr1_1782310331928",
+        "t": "Resolver sobre escritório",
+        "p": "",
+        "s": "Adiado",
+        "a": "Operações",
+        "r": "",
+        "c": "",
+        "re": "",
         "co": ""
       },
       {
