@@ -1214,7 +1214,8 @@ function showMigrationBanner(){
 window.migrateToGitHub = async function(){
   const banner = document.getElementById('rdm-migration-banner');
   if(banner) banner.querySelector('button').textContent = 'Publicando…';
-  await save();
+  clearTimeout(_saveDebounce); // cancela debounce pendente
+  await _triggerSave(); // usa o mutex diretamente
   // Se salvou com sucesso, limpa localStorage
   const el = document.getElementById('rdm-saved');
   if(el && el.textContent.includes('✓')){
@@ -1226,13 +1227,36 @@ window.migrateToGitHub = async function(){
   }
 };
 
-// Debounce: múltiplas edições rápidas colapsam em um único save
+// Debounce + Mutex: edições rápidas colapsam (debounce) e saves nunca rodam em paralelo (mutex)
 let _saveDebounce=null;
+let _saveLock=false;
+let _savePending=false;
+
 function save(){
   const el=document.getElementById('rdm-saved');
   if(el){el.textContent='...';}
   clearTimeout(_saveDebounce);
-  _saveDebounce=setTimeout(_performSave,800);
+  _saveDebounce=setTimeout(_triggerSave,800);
+}
+
+async function _triggerSave(){
+  if(_saveLock){
+    // já está salvando → marcar como pendente para rodar depois
+    console.log('[Ocean Roadmap] Save pendente (outro em andamento)');
+    _savePending=true;
+    return;
+  }
+  _saveLock=true;
+  try{await _performSave();}
+  catch(e){console.error('[Ocean Roadmap] _performSave error:',e);}
+  finally{
+    _saveLock=false;
+    if(_savePending){
+      _savePending=false;
+      console.log('[Ocean Roadmap] Executando save pendente...');
+      _triggerSave();
+    }
+  }
 }
 async function _performSave(){
   // 1) Garantir token
