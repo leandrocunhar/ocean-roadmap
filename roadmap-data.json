@@ -106,6 +106,17 @@
         "co": ""
       },
       {
+        "id": "o1t6",
+        "t": "Revisar cadência de reuniões de gestão",
+        "p": "Jul/26",
+        "s": "Iniciar",
+        "a": "Governança",
+        "r": "Fábio, Leandro, Fernando",
+        "c": "1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta\n3. Implementar",
+        "re": "Reuniões de gestão ativas com pauta e ata",
+        "co": ""
+      },
+      {
         "id": "o1t3",
         "t": "Desenhar plano de carreira",
         "p": "Jul/26",
@@ -158,17 +169,6 @@
         "r": "Fernando, Fábio, Leandro",
         "c": "1. Listar todos os prestadores ativos\n2. Revisar modelo de contrato\n3. Adaptar para cada perfil\n4. Assinar",
         "re": "100% dos prestadores com contrato assinado",
-        "co": ""
-      },
-      {
-        "id": "o1t6",
-        "t": "Revisar cadência de reuniões de gestão",
-        "p": "Jul/26",
-        "s": "Iniciar",
-        "a": "Governança",
-        "r": "Fábio, Leandro, Fernando",
-        "c": "1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta\n3. Implementar",
-        "re": "Reuniões de gestão ativas com pauta e ata",
         "co": ""
       },
       {
