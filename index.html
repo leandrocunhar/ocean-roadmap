@@ -1170,9 +1170,13 @@ async function load(){
     if(res.ok){
       const j=await res.json();
       if(j.record&&Array.isArray(j.record)&&j.record.length){
-        data=j.record;
-        console.log('[Ocean Roadmap] Carregado do JSONbin:',j.record.length,'grupos');
-        return;
+        const totalTasks=j.record.reduce((s,g)=>s+(g.tasks||[]).length,0);
+        if(totalTasks>31){
+          data=j.record;
+          console.log('[Ocean Roadmap] Carregado do JSONbin:',totalTasks,'tarefas');
+          return;
+        }
+        console.log('[Ocean Roadmap] JSONbin tem apenas',totalTasks,'tarefas (DEF padrão) — buscando versão atualizada...');
       }
     }
   }catch(e){console.warn('[Ocean Roadmap] JSONbin load error:',e);}
