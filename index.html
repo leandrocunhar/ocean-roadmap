@@ -1153,77 +1153,54 @@ let data, filterStatus='all', filterResp='all';
 const collapsed={}, expanded={};
 let dragIdx=null, dragGid=null, dragSrc=null;
 
-// ── GitHub shared storage ──────────────────────────────────────────────
-const GH_REPO   = 'leandrocunhar/ocean-roadmap';
-const GH_BRANCH = 'main';
-const GH_FILE   = 'roadmap-data.json';
-let   _ghSha    = null; // SHA do arquivo atual no GitHub (necessário para PUT)
-
-function ghToken(){
-  return localStorage.getItem('ocean_gh_pat')||null;
-}
-function ghSetToken(t){
-  localStorage.setItem('ocean_gh_pat', t.trim());
-}
-function ghHeaders(write){
-  const h={'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
-  const tok=ghToken();
-  if(tok) h['Authorization']='Bearer '+tok;
-  return h;
-}
+// ── JSONbin.io shared storage ───────────────────────────────────────────
+const JBIN_ID  = '6a4af6a1f5f4af5e29642e9a';
+const JBIN_KEY = '$2a$10$t4KblVKa.IoLXYvzB5tlxeHJKYzEfavBaZdSlin0eZMR7CF1p1WXy';
+const JBIN_URL = 'https://api.jsonbin.io/v3/b/'+JBIN_ID;
 
 async function load(){
-  // ── Migração: se localStorage tiver dados, perguntar antes de sobrescrever ──
-  const localRaw = localStorage.getItem('ocean_rdm_v6');
+  // ── Migração: localStorage tem dados mais recentes ──
+  const localRaw=localStorage.getItem('ocean_rdm_v6');
   if(localRaw){
-    try{
-      const localData = JSON.parse(localRaw);
-      // Mostra banner de migração ao invés de descartar silenciosamente
-      data = localData;
-      _pendingMigration = true;
-      return; // usa dados locais; banner vai aparecer após render()
-    }catch(e){}
+    try{const d=JSON.parse(localRaw);data=d;_pendingMigration=true;return;}catch(e){}
   }
-  // ── Carga normal do GitHub ──
+  // ── Carga normal do JSONbin ──
   try{
-    const url=`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${GH_FILE}?t=${Date.now()}`;
-    const res=await fetch(url);
-    if(res.ok){data=await res.json();return;}
-  }catch(e){}
-  // fallback: DEF embutido
+    const res=await fetch(JBIN_URL+'/latest',{headers:{'X-Master-Key':JBIN_KEY}});
+    if(res.ok){const j=await res.json();if(j.record&&j.record.length){data=j.record;return;}}
+  }catch(e){console.warn('[Ocean Roadmap] JSONbin load error:',e);}
   data=JSON.parse(JSON.stringify(DEF));
 }
 
-let _pendingMigration = false;
+let _pendingMigration=false;
 
 function showMigrationBanner(){
-  if(!_pendingMigration) return;
-  const existing = document.getElementById('rdm-migration-banner');
-  if(existing) return;
-  const banner = document.createElement('div');
-  banner.id = 'rdm-migration-banner';
-  banner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:16px;font-size:13px;font-family:inherit;max-width:560px;';
-  banner.innerHTML = `
+  if(!_pendingMigration)return;
+  if(document.getElementById('rdm-migration-banner'))return;
+  const banner=document.createElement('div');
+  banner.id='rdm-migration-banner';
+  banner.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:16px;font-size:13px;font-family:inherit;max-width:560px;';
+  banner.innerHTML=`
     <span>⚠️ Você tem dados locais mais recentes que ainda não foram publicados no GitHub.</span>
-    <button onclick="migrateToGitHub()" style="background:#0071e3;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Publicar agora</button>
+    <button onclick="migrateToJSONbin()" style="background:#0071e3;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Publicar agora</button>
     <button onclick="document.getElementById('rdm-migration-banner').remove()" style="background:transparent;color:#aaa;border:1px solid #555;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">Ignorar</button>
   `;
   document.body.appendChild(banner);
 }
 
-window.migrateToGitHub = async function(){
-  const banner = document.getElementById('rdm-migration-banner');
-  if(banner) banner.querySelector('button').textContent = 'Publicando…';
-  clearTimeout(_saveDebounce); // cancela debounce pendente
-  await _triggerSave(); // usa o mutex diretamente
-  // Se salvou com sucesso, limpa localStorage
-  const el = document.getElementById('rdm-saved');
-  if(el && el.textContent.includes('✓')){
+window.migrateToJSONbin=async function(){
+  const banner=document.getElementById('rdm-migration-banner');
+  const btn=banner?banner.querySelector('button'):null;
+  if(btn)btn.textContent='Publicando…';
+  clearTimeout(_saveDebounce);
+  await _triggerSave();
+  const el=document.getElementById('rdm-saved');
+  if(el&&el.textContent.includes('✓')){
     localStorage.removeItem('ocean_rdm_v6');
-    _pendingMigration = false;
-    if(banner) banner.remove();
-  } else {
-    if(banner) banner.querySelector('button').textContent = 'Publicar agora';
+    _pendingMigration=false;
+    if(banner)banner.remove();
+  }else{
+    if(btn)btn.textContent='Publicar agora';
   }
 };
 
@@ -1259,107 +1236,23 @@ async function _triggerSave(){
   }
 }
 async function _performSave(){
-  // 1) Garantir token
-  if(!ghToken()){
-    await new Promise(resolve=>{
-      const overlay=document.createElement('div');
-      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;display:flex;align-items:center;justify-content:center;';
-      overlay.innerHTML=`<div style="background:#fff;border-radius:16px;padding:32px;max-width:480px;width:90%;font-family:inherit;box-shadow:0 24px 64px rgba(0,0,0,.3);">
-        <h3 style="font-size:17px;font-weight:800;margin-bottom:8px;">Configurar token GitHub</h3>
-        <p style="font-size:13px;color:#6e6e73;margin-bottom:20px;">Para salvar de forma compartilhada com o time, cole seu GitHub Personal Access Token (PAT). Ele fica armazenado só neste navegador.</p>
-        <input id="gh-pat-input" type="password" placeholder="github_pat_..." style="width:100%;padding:10px 14px;border:1px solid #d1d1d6;border-radius:8px;font-size:13px;margin-bottom:16px;box-sizing:border-box;" />
-        <div style="display:flex;gap:10px;justify-content:flex-end;">
-          <button onclick="this.closest('div').parentElement.parentElement.remove();resolve();" style="padding:9px 18px;border:1px solid #d1d1d6;border-radius:8px;font-size:13px;cursor:pointer;background:#fff;">Cancelar</button>
-          <button onclick="const v=document.getElementById('gh-pat-input').value.trim();if(!v)return;ghSetToken(v);this.closest('div').parentElement.parentElement.remove();resolve();" style="padding:9px 18px;background:#0071e3;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Salvar token</button>
-        </div>
-      </div>`;
-      document.body.appendChild(overlay);
-    });
-    if(!ghToken()){return;} // cancelou
-  }
-  // Indicador de saving
   const el=document.getElementById('rdm-saved');
   if(el){el.textContent='Salvando…';}
   try{
-    // 2) Buscar SHA atual via Git Refs API (não tem cache server-side)
-    async function fetchFreshSha(){
-      try{
-        // Pega o commit HEAD do branch
-        const refRes=await fetch(`https://api.github.com/repos/${GH_REPO}/git/ref/heads/${GH_BRANCH}`,{
-          headers:ghHeaders(),cache:'reload'
-        });
-        if(!refRes.ok) throw new Error('ref fetch '+refRes.status);
-        const ref=await refRes.json();
-        const commitSha=ref.object.sha;
-        // Pega a árvore do commit (recursive para arquivos na raiz)
-        const treeRes=await fetch(`https://api.github.com/repos/${GH_REPO}/git/commits/${commitSha}`,{
-          headers:ghHeaders(),cache:'reload'
-        });
-        if(!treeRes.ok) throw new Error('commit fetch '+treeRes.status);
-        const commit=await treeRes.json();
-        const treeRes2=await fetch(`https://api.github.com/repos/${GH_REPO}/git/trees/${commit.tree.sha}`,{
-          headers:ghHeaders(),cache:'reload'
-        });
-        if(!treeRes2.ok) throw new Error('tree fetch '+treeRes2.status);
-        const tree=await treeRes2.json();
-        const fileNode=tree.tree.find(f=>f.path===GH_FILE);
-        console.log('[Ocean Roadmap] SHA via Refs API:',fileNode?fileNode.sha:'null (arquivo novo)');
-        return fileNode?fileNode.sha:null;
-      }catch(err2){
-        console.warn('[Ocean Roadmap] Refs API falhou, tentando Contents API:',err2);
-        // Fallback: Contents API com cache bust
-        const r=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
-          headers:{...ghHeaders(),'Cache-Control':'no-cache'},cache:'reload'
-        });
-        if(r.ok){const m=await r.json();return m.sha;}
-        if(r.status===404) return null;
-        return _ghSha;
-      }
+    const res=await fetch(JBIN_URL,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':JBIN_KEY},
+      body:JSON.stringify(data)
+    });
+    if(res.ok){
+      if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
+    }else{
+      throw new Error('JSONbin error '+res.status);
     }
-    _ghSha=await fetchFreshSha();
-    // 3) Encode JSON em base64 (UTF-8 safe)
-    const jsonStr=JSON.stringify(data,null,2);
-    const b64=btoa(unescape(encodeURIComponent(jsonStr)));
-    // 4) Função interna de PUT (com retry automático em caso de 409)
-    async function doPut(sha, attempt){
-      console.log('[Ocean Roadmap] doPut attempt='+attempt+' sha='+sha);
-      const body={message:'Roadmap atualizado',content:b64,branch:GH_BRANCH};
-      if(sha) body.sha=sha;
-      const putRes=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{
-        method:'PUT',headers:ghHeaders(true),body:JSON.stringify(body)
-      });
-      if(putRes.ok){
-        const r=await putRes.json();
-        _ghSha=r.content&&r.content.sha?r.content.sha:sha;
-        if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
-      }else{
-        const err=await putRes.json().catch(()=>({}));
-        console.error('[Ocean Roadmap] PUT falhou',putRes.status,err);
-        if(putRes.status===409 && attempt<2){
-          // SHA desatualizado → buscar SHA fresco via Refs API e retry
-          console.log('[Ocean Roadmap] 409 → buscando SHA fresco para retry...');
-          const freshSha=await fetchFreshSha();
-          console.log('[Ocean Roadmap] SHA fresco para retry:',freshSha);
-          if(freshSha!==null){_ghSha=freshSha;await doPut(freshSha,attempt+1);}
-          else throw new Error('Não foi possível obter SHA para retry');
-        }else if(putRes.status===401||putRes.status===403){
-          localStorage.removeItem('ocean_gh_pat');
-          if(el){el.textContent='⚠ Token inválido';}
-          alert('Token inválido ou sem permissão ('+putRes.status+'). Edite algo para configurar novamente.');
-          throw new Error('token-invalid');
-        }else{
-          if(el){el.textContent='⚠ Erro '+putRes.status;}
-          alert('Erro ao salvar ('+putRes.status+'): '+(err.message||'verifique o console F12'));
-          throw new Error(err.message||putRes.status);
-        }
-      }
-    }
-    await doPut(_ghSha, 0);
   }catch(e){
-    // Fallback local
     try{localStorage.setItem('ocean_rdm_v6',JSON.stringify(data));}catch(_){}
     if(el){el.textContent='⚠ Erro (salvo local)';}
-    console.error('[Ocean Roadmap] Erro ao salvar no GitHub:',e);
+    console.error('[Ocean Roadmap] Erro ao salvar:',e);
   }
 }
 window.rdmStatus=function(gid,tid,sel){
@@ -1610,11 +1503,11 @@ setInterval(async ()=>{
   const pg = document.getElementById('page-roadmap');
   if(!pg || pg.style.display==='none') return;
   try{
-    const url=`https://raw.githubusercontent.com/${GH_REPO}/${GH_BRANCH}/${GH_FILE}?t=${Date.now()}`;
-    const res=await fetch(url);
+    const res=await fetch(JBIN_URL+'/latest',{headers:{'X-Master-Key':JBIN_KEY}});
     if(!res.ok) return;
-    const fresh=await res.json();
-    // Compara por SHA rápido (stringify)
+    const j=await res.json();
+    const fresh=j.record;
+    if(!fresh||!fresh.length) return;
     if(JSON.stringify(fresh)!==JSON.stringify(data)){
       data=fresh;
       render();
@@ -1944,228 +1837,4 @@ function showPage(page) {
     function endDraw(){
       if(isPanning){isPanning=false;updateCursor();return;}
       if(!drawing)return;drawing=false;
-      if(tool==='pen'||tool==='eraser'){
-        if(currentStroke&&currentStroke.pts.length>1){ops.push(currentStroke);persist();}
-        currentStroke=null;
-      }else if(previewOp){ops.push(previewOp);previewOp=null;persist();}
-      scheduleDraw();
-    }
-    canvas.addEventListener('mouseup',endDraw);
-    canvas.addEventListener('mouseleave',function(){
-      if(drawing&&(tool==='pen'||tool==='eraser')){
-        if(currentStroke&&currentStroke.pts.length>1){ops.push(currentStroke);persist();}
-        currentStroke=null;drawing=false;scheduleDraw();
-      }
-    });
-
-    wrap.addEventListener('wheel',function(e){
-      if(e.ctrlKey||e.metaKey){
-        e.preventDefault();
-        const r=canvas.getBoundingClientRect();
-        const mx=e.clientX-r.left,my=e.clientY-r.top;
-        const f=e.deltaY>0?0.9:1.111;
-        const nz=Math.max(0.05,Math.min(8,zoom*f));
-        panX=mx-(mx-panX)*(nz/zoom);panY=my-(my-panY)*(nz/zoom);
-        zoom=nz;updateCursor();scheduleDraw();
-      }else{panX-=e.deltaX;panY-=e.deltaY;scheduleDraw();}
-    },{passive:false});
-
-    document.addEventListener('keydown',function(e){
-      const wb=document.getElementById('page-whiteboard');
-      if(!wb||wb.style.display==='none')return;
-      if(e.code==='Space'&&document.activeElement===document.body){
-        if(!spaceDown){spaceDown=true;updateCursor();}e.preventDefault();
-      }
-      if(imgState){
-        if(e.key==='Enter'){e.preventDefault();window.wbImgCommit();return;}
-        if(e.key==='Escape'){e.preventDefault();window.wbImgCancel();return;}
-      }
-      if(e.ctrlKey&&e.key==='z'){e.preventDefault();window.wbUndo();}
-    });
-    document.addEventListener('keyup',function(e){
-      if(e.code==='Space'){spaceDown=false;if(!isPanning)updateCursor();}
-    });
-
-    textInput.addEventListener('mousedown',function(e){e.stopPropagation();});
-    textInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();commitText();}});
-    textInput.addEventListener('blur',function(){setTimeout(commitText,100);});
-  }
-
-  function showText(e){
-    textInput.style.left=e.clientX+'px';textInput.style.top=e.clientY+'px';
-    const fs=Math.max(16,wbSize*5);
-    textInput.style.fontSize=fs+'px';textInput.style.color=wbColor;
-    textInput.style.display='block';textInput.value='';
-    setTimeout(function(){textInput.focus();},10);
-  }
-
-  function commitText(){
-    if(textInput.style.display==='none')return;
-    const val=textInput.value.trim();textInput.style.display='none';
-    if(!val)return;
-    const r=canvas.getBoundingClientRect();
-    const fs=parseInt(textInput.style.fontSize)||18;
-    const wpt=toW(parseFloat(textInput.style.left)-r.left,parseFloat(textInput.style.top)-r.top);
-    snapshot();
-    ops.push({type:'text',color:wbColor,fs:fs/zoom,x:wpt.x,y:wpt.y+fs/zoom,text:val});
-    persist();scheduleDraw();
-  }
-
-  function updateCursor(){
-    if(!canvas)return;
-    if(spaceDown||isPanning){canvas.style.cursor=isPanning?'grabbing':'grab';return;}
-    if(tool==='text'){canvas.style.cursor='text';return;}
-    if(tool==='rect'||tool==='circle'||tool==='arrow'){canvas.style.cursor='crosshair';return;}
-    const sw=tool==='eraser'?wbSize*6*zoom:wbSize*zoom;
-    const rad=Math.max(sw/2,2),d=Math.ceil(rad)+4,side=d*2;
-    const tmp=document.createElement('canvas');tmp.width=side;tmp.height=side;
-    const cx=tmp.getContext('2d');
-    cx.beginPath();cx.arc(d,d,rad,0,Math.PI*2);
-    if(tool==='eraser'){cx.fillStyle='rgba(255,255,255,.9)';cx.fill();cx.strokeStyle='#888';cx.lineWidth=1.5;cx.stroke();}
-    else{cx.fillStyle=wbColor;cx.fill();cx.strokeStyle='rgba(0,0,0,.25)';cx.lineWidth=1;cx.stroke();}
-    canvas.style.cursor='url('+tmp.toDataURL()+') '+d+' '+d+', crosshair';
-  }
-
-  function bindImg(){
-    imgOverlay.addEventListener('mousedown',function(e){
-      if(e.target.classList.contains('wb-img-handle'))return;
-      e.stopPropagation();if(!imgState)return;
-      imgDragActive=true;imgState.resizeCorner=null;
-      imgState.dsx=e.clientX;imgState.dsy=e.clientY;imgState.ox=imgState.x;imgState.oy=imgState.y;
-    });
-    imgOverlay.querySelectorAll('.wb-img-handle').forEach(function(h){
-      h.addEventListener('mousedown',function(e){
-        e.stopPropagation();if(!imgState)return;
-        imgDragActive=true;imgState.resizeCorner=h.dataset.corner;
-        imgState.dsx=e.clientX;imgState.dsy=e.clientY;
-        imgState.ox=imgState.x;imgState.oy=imgState.y;imgState.ow=imgState.w;imgState.oh=imgState.h;
-      });
-    });
-    document.addEventListener('mousemove',function(e){
-      if(!imgDragActive||!imgState)return;
-      const dx=e.clientX-imgState.dsx,dy=e.clientY-imgState.dsy;
-      const c=imgState.resizeCorner;
-      if(c){
-        let nw=imgState.ow,nh=imgState.oh,nx=imgState.ox,ny=imgState.oy;
-        if(c==='se'){nw=Math.max(40,imgState.ow+dx);nh=Math.max(40,imgState.oh+dy);}
-        else if(c==='sw'){nw=Math.max(40,imgState.ow-dx);nh=Math.max(40,imgState.oh+dy);nx=imgState.ox+imgState.ow-nw;}
-        else if(c==='ne'){nw=Math.max(40,imgState.ow+dx);nh=Math.max(40,imgState.oh-dy);ny=imgState.oy+imgState.oh-nh;}
-        else if(c==='nw'){nw=Math.max(40,imgState.ow-dx);nh=Math.max(40,imgState.oh-dy);nx=imgState.ox+imgState.ow-nw;ny=imgState.oy+imgState.oh-nh;}
-        imgState.w=nw;imgState.h=nh;imgState.x=nx;imgState.y=ny;
-      }else{imgState.x=imgState.ox+dx;imgState.y=imgState.oy+dy;}
-      updImgOv();
-    });
-    document.addEventListener('mouseup',function(){
-      if(imgDragActive){imgDragActive=false;if(imgState)imgState.resizeCorner=null;}
-    });
-    document.addEventListener('paste',function(e){
-      const wb=document.getElementById('page-whiteboard');
-      if(!wb||wb.style.display==='none')return;
-      const items=e.clipboardData&&e.clipboardData.items;if(!items)return;
-      for(let i=0;i<items.length;i++){
-        if(items[i].type.startsWith('image/')){loadImgBlob(items[i].getAsFile());e.preventDefault();break;}
-      }
-    });
-  }
-
-  function loadImgBlob(blob){
-    if(imgState)window.wbImgCancel();
-    const url=URL.createObjectURL(blob);
-    const img=new Image();
-    img.onload=function(){
-      const mw=canvas.width*.7,mh=canvas.height*.7;
-      const sc=Math.min(1,mw/img.naturalWidth,mh/img.naturalHeight);
-      const sw=Math.round(img.naturalWidth*sc),sh=Math.round(img.naturalHeight*sc);
-      const sx=Math.round((canvas.width-sw)/2),sy=Math.round((canvas.height-sh)/2);
-      imgEl.src=url;
-      imgState={x:sx,y:sy,w:sw,h:sh,img:img,resizeCorner:null,dsx:0,dsy:0,ox:sx,oy:sy,ow:sw,oh:sh};
-      imgOverlay.style.display='block';updImgOv();
-    };
-    img.src=url;
-  }
-
-  function updImgOv(){
-    if(!imgOverlay||!imgState)return;
-    imgOverlay.style.left=imgState.x+'px';imgOverlay.style.top=imgState.y+'px';
-    imgOverlay.style.width=imgState.w+'px';imgOverlay.style.height=imgState.h+'px';
-  }
-
-  window.wbImgCommit=function(){
-    if(!canvas||!imgState)return;
-    const wx=(imgState.x-panX)/zoom,wy=(imgState.y-panY)/zoom;
-    const ww=imgState.w/zoom,wh=imgState.h/zoom;
-    snapshot();
-    const img=imgEl;
-    ops.push({type:'image',x:wx,y:wy,w:ww,h:wh,img:img,imgSrc:img.src});
-    persist();scheduleDraw();
-    imgOverlay.style.display='none';imgState=null;imgDragActive=false;
-  };
-  window.wbImgCancel=function(){
-    if(imgOverlay)imgOverlay.style.display='none';
-    imgState=null;imgDragActive=false;
-  };
-  window.wbPasteImg=async function(){
-    try{
-      const items=await navigator.clipboard.read();
-      for(const item of items)for(const type of item.types)
-        if(type.startsWith('image/')){loadImgBlob(await item.getType(type));return;}
-      alert('Nenhuma imagem no clipboard.\nUse Ctrl+V diretamente.');
-    }catch(e){alert('Use Ctrl+V para colar imagens.');}
-  };
-
-  window.wbSetTool=function(t){
-    tool=t;
-    document.querySelectorAll('.wb-tool-btn').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
-    updateCursor();
-  };
-  window.wbSetColor=function(c){
-    wbColor=c;
-    document.querySelectorAll('.wb-color').forEach(b=>b.classList.toggle('active',b.dataset.color===c));
-    updateCursor();
-  };
-  window.wbSetSize=function(s){
-    wbSize=s;
-    document.querySelectorAll('.wb-size-btn').forEach(b=>b.classList.toggle('active',+b.dataset.size===+s));
-    updateCursor();
-  };
-  window.wbUndo=function(){
-    if(!undoStack.length)return;
-    try{
-      ops=JSON.parse(undoStack.pop()).map(o=>{
-        if(o.type==='image'&&o.imgSrc){const img=new Image();img.src=o.imgSrc;img.onload=scheduleDraw;return{...o,img};}
-        return o;
-      });
-    }catch(e){ops=[];}
-    persist();scheduleDraw();
-  };
-  window.wbClear=function(){
-    if(!confirm('Apagar tudo no whiteboard?'))return;
-    undoStack=[];ops=[];
-    panX=canvas?canvas.width/2:0;panY=canvas?canvas.height/2:0;zoom=1;
-    updateCursor();
-    try{localStorage.removeItem('ocean_wb_v2');}catch(e){}
-    scheduleDraw();
-  };
-  window.wbZoomIn=function(){
-    const f=1.25;zoom=Math.min(8,zoom*f);
-    panX=canvas.width/2-(canvas.width/2-panX)*f;
-    panY=canvas.height/2-(canvas.height/2-panY)*f;
-    updateCursor();scheduleDraw();
-  };
-  window.wbZoomOut=function(){
-    const f=1.25;zoom=Math.max(0.05,zoom/f);
-    panX=canvas.width/2-(canvas.width/2-panX)/f;
-    panY=canvas.height/2-(canvas.height/2-panY)/f;
-    updateCursor();scheduleDraw();
-  };
-  window.wbZoomReset=function(){
-    zoom=1;panX=canvas?canvas.width/2:0;panY=canvas?canvas.height/2:0;
-    updateCursor();scheduleDraw();
-  };
-  window.wbExport=function(){
-    if(!canvas)return;
-    const link=document.createElement('a');link.download='whiteboard.png';
-    link.href=canvas.toDataURL('image/png');link.click();
-  };
-})();
-</script>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+      
