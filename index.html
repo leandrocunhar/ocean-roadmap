@@ -1153,79 +1153,53 @@ let data, filterStatus='all', filterResp='all';
 const collapsed={}, expanded={};
 let dragIdx=null, dragGid=null, dragSrc=null;
 
-// ── JSONbin.io shared storage ───────────────────────────────────────────
-const JBIN_ID  = '6a4af6a1f5f4af5e29642e9a';
-const JBIN_KEY = '$2a$10$t4KblVKa.IoLXYvzB5tlxeHJKYzEfavBaZdSlin0eZMR7CF1p1WXy';
-const JBIN_URL = 'https://api.jsonbin.io/v3/b/'+JBIN_ID;
+// ── GitHub shared storage ────────────────────────────────────────────────
+const GH_OWNER = 'leandrocunhar';
+const GH_REPO  = 'ocean-roadmap';
+const GH_FILE  = 'roadmap-data.json';
+const GH_RAW   = 'https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/main/'+GH_FILE;
+const GH_API   = 'https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+GH_FILE;
+function ghToken(){ return localStorage.getItem('gh_rdm_token')||''; }
 
 async function load(){
-  // ── Migração: localStorage tem dados mais recentes ──
-  const localRaw=localStorage.getItem('ocean_rdm_v6');
-  if(localRaw){
-    try{const d=JSON.parse(localRaw);data=d;_pendingMigration=true;return;}catch(e){}
-  }
-  // ── Carga normal do JSONbin ──
   try{
-    const res=await fetch(JBIN_URL+'/latest',{headers:{'X-Master-Key':JBIN_KEY}});
-    if(res.ok){
-      const j=await res.json();
-      if(j.record&&Array.isArray(j.record)&&j.record.length){
-        const totalTasks=j.record.reduce((s,g)=>s+(g.tasks||[]).length,0);
-        if(totalTasks>31){
-          data=j.record;
-          console.log('[Ocean Roadmap] Carregado do JSONbin:',totalTasks,'tarefas');
-          return;
-        }
-        console.log('[Ocean Roadmap] JSONbin tem apenas',totalTasks,'tarefas (DEF padrão) — buscando versão atualizada...');
-      }
-    }
-  }catch(e){console.warn('[Ocean Roadmap] JSONbin load error:',e);}
-  // ── Fallback: roadmap-data.json no GitHub (auto-salva no JSONbin) ──
-  try{
-    const res=await fetch('https://raw.githubusercontent.com/leandrocunhar/ocean-roadmap/main/roadmap-data.json?t='+Date.now());
+    const res=await fetch(GH_RAW+'?t='+Date.now());
     if(res.ok){
       const d=await res.json();
       if(d&&Array.isArray(d)&&d.length){
         data=d;
-        console.log('[Ocean Roadmap] Fallback GitHub: carregados',d.length,'grupos. Auto-salvando no JSONbin...');
-        setTimeout(()=>_triggerSave(),1500);
+        console.log('[Ocean Roadmap] Carregado do GitHub:',d.length,'grupos');
         return;
       }
     }
-  }catch(e){console.warn('[Ocean Roadmap] GitHub fallback error:',e);}
+  }catch(e){console.warn('[Ocean Roadmap] GitHub raw error:',e);}
   data=JSON.parse(JSON.stringify(DEF));
 }
 
-let _pendingMigration=false;
-
 function showMigrationBanner(){
-  if(!_pendingMigration)return;
-  if(document.getElementById('rdm-migration-banner'))return;
-  const banner=document.createElement('div');
-  banner.id='rdm-migration-banner';
-  banner.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:16px;font-size:13px;font-family:inherit;max-width:560px;';
-  banner.innerHTML=`
-    <span>⚠️ Você tem dados locais mais recentes que ainda não foram publicados no GitHub.</span>
-    <button onclick="migrateToJSONbin()" style="background:#0071e3;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Publicar agora</button>
-    <button onclick="document.getElementById('rdm-migration-banner').remove()" style="background:transparent;color:#aaa;border:1px solid #555;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">Ignorar</button>
-  `;
-  document.body.appendChild(banner);
+  if(!ghToken()){showTokenBanner();}
 }
 
-window.migrateToJSONbin=async function(){
-  const banner=document.getElementById('rdm-migration-banner');
-  const btn=banner?banner.querySelector('button'):null;
-  if(btn)btn.textContent='Publicando…';
-  clearTimeout(_saveDebounce);
-  await _triggerSave();
+function showTokenBanner(){
+  if(document.getElementById('rdm-token-banner'))return;
+  const banner=document.createElement('div');
+  banner.id='rdm-token-banner';
+  banner.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1c1e;color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:10px;font-size:13px;font-family:inherit;max-width:680px;';
+  banner.innerHTML='<span>🔑 Cole o token para habilitar o salvamento:</span>'
+    +'<input id="rdm-token-input" type="password" placeholder="github_pat_..." style="border:1px solid #555;background:#2c2c2e;color:#fff;border-radius:6px;padding:6px 10px;font-size:12px;width:220px;outline:none;">'
+    +'<button onclick="rdmSaveToken()" style="background:#0071e3;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;">Salvar</button>'
+    +'<button onclick="document.getElementById(\'rdm-token-banner\').remove()" style="background:transparent;color:#aaa;border:1px solid #555;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;">✕</button>';
+  document.body.appendChild(banner);
+  setTimeout(()=>{const inp=document.getElementById('rdm-token-input');if(inp)inp.focus();},50);
+}
+
+window.rdmSaveToken=function(){
+  const inp=document.getElementById('rdm-token-input');if(!inp)return;
+  const t=inp.value.trim();if(!t){return;}
+  localStorage.setItem('gh_rdm_token',t);
+  const b=document.getElementById('rdm-token-banner');if(b)b.remove();
   const el=document.getElementById('rdm-saved');
-  if(el&&el.textContent.includes('✓')){
-    localStorage.removeItem('ocean_rdm_v6');
-    _pendingMigration=false;
-    if(banner)banner.remove();
-  }else{
-    if(btn)btn.textContent='Publicar agora';
-  }
+  if(el){el.textContent='✓ Token salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
 };
 
 // Debounce + Mutex: edições rápidas colapsam (debounce) e saves nunca rodam em paralelo (mutex)
@@ -1261,21 +1235,52 @@ async function _triggerSave(){
 }
 async function _performSave(){
   const el=document.getElementById('rdm-saved');
+  const token=ghToken();
+  if(!token){
+    showTokenBanner();
+    if(el){el.textContent='⚠ Token necessário';setTimeout(()=>{if(el)el.textContent='';},3000);}
+    return;
+  }
   if(el){el.textContent='Salvando…';}
   try{
-    const res=await fetch(JBIN_URL,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':JBIN_KEY},
-      body:JSON.stringify(data)
+    // 1. Buscar SHA atual do arquivo
+    let sha=null;
+    const getRes=await fetch(GH_API,{
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
     });
-    if(res.ok){
+    if(getRes.ok){const j=await getRes.json();sha=j.sha;}
+    else if(getRes.status!==404){throw new Error('GitHub GET '+getRes.status);}
+
+    // 2. PUT novo conteúdo
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+    const body={message:'roadmap update',content};
+    if(sha)body.sha=sha;
+    const putRes=await fetch(GH_API,{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      body:JSON.stringify(body)
+    });
+    if(putRes.ok){
       if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
+    }else if(putRes.status===409){
+      // SHA desatualizado → retry com SHA fresco
+      console.warn('[Ocean Roadmap] SHA conflict, retrying...');
+      const r2=await fetch(GH_API,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}});
+      if(r2.ok){
+        const j2=await r2.json();
+        const b2={message:'roadmap update',content,sha:j2.sha};
+        const p2=await fetch(GH_API,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(b2)});
+        if(p2.ok){if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}return;}
+      }
+      throw new Error('SHA conflict após retry');
+    }else if(putRes.status===401||putRes.status===403){
+      localStorage.removeItem('gh_rdm_token');showTokenBanner();
+      throw new Error('GitHub auth error '+putRes.status);
     }else{
-      throw new Error('JSONbin error '+res.status);
+      throw new Error('GitHub PUT '+putRes.status);
     }
   }catch(e){
-    try{localStorage.setItem('ocean_rdm_v6',JSON.stringify(data));}catch(_){}
-    if(el){el.textContent='⚠ Erro (salvo local)';}
+    if(el){el.textContent='⚠ Erro ao salvar';setTimeout(()=>{if(el)el.textContent='';},3000);}
     console.error('[Ocean Roadmap] Erro ao salvar:',e);
   }
 }
@@ -1523,14 +1528,12 @@ load().then(()=>{render();showMigrationBanner();});
 // Auto-refresh: busca dados do GitHub a cada 60s e re-renderiza se houve mudança
 const POLL_INTERVAL = 60000;
 setInterval(async ()=>{
-  // Só atualiza se a aba roadmap estiver visível
   const pg = document.getElementById('page-roadmap');
   if(!pg || pg.style.display==='none') return;
   try{
-    const res=await fetch(JBIN_URL+'/latest',{headers:{'X-Master-Key':JBIN_KEY}});
+    const res=await fetch(GH_RAW+'?t='+Date.now());
     if(!res.ok) return;
-    const j=await res.json();
-    const fresh=j.record;
+    const fresh=await res.json();
     if(!fresh||!fresh.length) return;
     if(JSON.stringify(fresh)!==JSON.stringify(data)){
       data=fresh;
@@ -2065,24 +2068,4 @@ function showPage(page) {
   };
   window.wbZoomIn=function(){
     const f=1.25;zoom=Math.min(8,zoom*f);
-    panX=canvas.width/2-(canvas.width/2-panX)*f;
-    panY=canvas.height/2-(canvas.height/2-panY)*f;
-    updateCursor();scheduleDraw();
-  };
-  window.wbZoomOut=function(){
-    const f=1.25;zoom=Math.max(0.05,zoom/f);
-    panX=canvas.width/2-(canvas.width/2-panX)/f;
-    panY=canvas.height/2-(canvas.height/2-panY)/f;
-    updateCursor();scheduleDraw();
-  };
-  window.wbZoomReset=function(){
-    zoom=1;panX=canvas?canvas.width/2:0;panY=canvas?canvas.height/2:0;
-    updateCursor();scheduleDraw();
-  };
-  window.wbExport=function(){
-    if(!canvas)return;
-    const link=document.createElement('a');link.download='whiteboard.png';
-    link.href=canvas.toDataURL('image/png');link.click();
-  };
-})();
-</script>
+    panX=canvas.width/
