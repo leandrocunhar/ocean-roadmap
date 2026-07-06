@@ -90,8 +90,8 @@
         "s": "Validar",
         "a": "Governança",
         "r": "Leandro, Fábio, Fernando",
-        "c": "1. Mapear funções atuais\n2. Desenhar cenários\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando",
-        "re": "",
+        "c": "1. Mapear funções atuais\n2. Desenhar 3 verticais\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando",
+        "re": "Organograma aprovado com papéis e responsabilidades claras",
         "co": ""
       },
       {
@@ -102,7 +102,7 @@
         "a": "Financeiro",
         "r": "Leandro, Fábio, Fernando",
         "c": "1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time",
-        "re": "",
+        "re": "Novo modelo simples, justo e compreensível por todos",
         "co": ""
       },
       {
@@ -113,7 +113,7 @@
         "a": "Governança",
         "r": "Leandro, Fábio, Fernando",
         "c": "1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração",
-        "re": "",
+        "re": "Plano de carreira documentado e apresentado ao time",
         "co": ""
       },
       {
@@ -123,7 +123,7 @@
         "s": "Em andamento",
         "a": "Operações",
         "r": "Fábio",
-        "c": "1. Reuniões equipe \n2. Reuniões 1-1",
+        "c": "1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar",
         "re": "",
         "co": ""
       },
@@ -134,8 +134,8 @@
         "s": "Iniciar",
         "a": "Governança",
         "r": "Fábio, Leandro, Fernando",
-        "c": "1. BD (SEG/QUI) / DELIVERY (TER/SEX) / ALL (QUA)\n2. Organizar pautas",
-        "re": "",
+        "c": "1. Definir reuniões fixas (diária, semanal, mensal)\n2. Criar templates de pauta\n3. Implementar",
+        "re": "Reuniões de gestão ativas com pauta e ata",
         "co": ""
       },
       {
