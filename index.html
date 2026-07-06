@@ -2068,4 +2068,24 @@ function showPage(page) {
   };
   window.wbZoomIn=function(){
     const f=1.25;zoom=Math.min(8,zoom*f);
-    panX=canvas.width/
+    panX=canvas.width/2-(canvas.width/2-panX)*f;
+    panY=canvas.height/2-(canvas.height/2-panY)*f;
+    updateCursor();scheduleDraw();
+  };
+  window.wbZoomOut=function(){
+    const f=1.25;zoom=Math.max(0.05,zoom/f);
+    panX=canvas.width/2-(canvas.width/2-panX)/f;
+    panY=canvas.height/2-(canvas.height/2-panY)/f;
+    updateCursor();scheduleDraw();
+  };
+  window.wbZoomReset=function(){
+    zoom=1;panX=canvas?canvas.width/2:0;panY=canvas?canvas.height/2:0;
+    updateCursor();scheduleDraw();
+  };
+  window.wbExport=function(){
+    if(!canvas)return;
+    const link=document.createElement('a');link.download='whiteboard.png';
+    link.href=canvas.toDataURL('image/png');link.click();
+  };
+})();
+</script>
