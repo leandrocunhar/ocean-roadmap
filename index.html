@@ -1162,6 +1162,16 @@ const GH_API   = 'https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents
 function ghToken(){ return localStorage.getItem('gh_rdm_token')||''; }
 
 async function load(){
+  // Cache local: se o usuário salvou há <3 min, evita CDN desatualizado
+  try{
+    const bkp=JSON.parse(localStorage.getItem('ocean_rdm_local')||'null');
+    if(bkp&&Array.isArray(bkp.d)&&bkp.d.length&&(Date.now()-bkp.t)<180000){
+      data=bkp.d;
+      console.log('[Ocean Roadmap] Cache local (<3min) carregado');
+      return;
+    }
+  }catch(_){}
+  // GitHub raw (sem auth, CDN)
   try{
     const res=await fetch(GH_RAW+'?t='+Date.now());
     if(res.ok){
@@ -1261,6 +1271,7 @@ async function _performSave(){
       body:JSON.stringify(body)
     });
     if(putRes.ok){
+      try{localStorage.setItem('ocean_rdm_local',JSON.stringify({d:data,t:Date.now()}));}catch(_){}
       if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}
     }else if(putRes.status===409){
       // SHA desatualizado → retry com SHA fresco
@@ -1270,7 +1281,9 @@ async function _performSave(){
         const j2=await r2.json();
         const b2={message:'roadmap update',content,sha:j2.sha};
         const p2=await fetch(GH_API,{method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(b2)});
-        if(p2.ok){if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}return;}
+        if(p2.ok){
+          try{localStorage.setItem('ocean_rdm_local',JSON.stringify({d:data,t:Date.now()}));}catch(_){}
+          if(el){el.textContent='✓ Salvo';setTimeout(()=>{if(el)el.textContent='';},2500);}return;}
       }
       throw new Error('SHA conflict após retry');
     }else if(putRes.status===401||putRes.status===403){
@@ -1524,6 +1537,11 @@ document.addEventListener('click',function(e){
 });
 
 load().then(()=>{render();showMigrationBanner();});
+
+// Flush do debounce pendente antes de sair da página
+window.addEventListener('beforeunload',function(){
+  if(_saveDebounce){clearTimeout(_saveDebounce);_triggerSave();}
+});
 
 // Auto-refresh: busca dados do GitHub a cada 60s e re-renderiza se houve mudança
 const POLL_INTERVAL = 60000;
