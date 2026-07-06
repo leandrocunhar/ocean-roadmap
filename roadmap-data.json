@@ -267,17 +267,6 @@
         "c": "1. Tags Maggo",
         "re": "",
         "co": ""
-      },
-      {
-        "id": "o3t4",
-        "t": "Integrar pipeline ao ATS",
-        "p": "Set/26",
-        "s": "Bloqueado",
-        "a": "Tecnologia",
-        "r": "Fernando, Leandro",
-        "c": "1. Mapear fluxo candidato → vaga\n2. Configurar automações básicas\n3. Testar e ajustar",
-        "re": "Pipeline de talentos integrado ao ATS operacional",
-        "co": ""
       }
     ]
   },
