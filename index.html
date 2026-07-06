@@ -1226,7 +1226,15 @@ window.migrateToGitHub = async function(){
   }
 };
 
-async function save(){
+// Debounce: múltiplas edições rápidas colapsam em um único save
+let _saveDebounce=null;
+function save(){
+  const el=document.getElementById('rdm-saved');
+  if(el){el.textContent='...';}
+  clearTimeout(_saveDebounce);
+  _saveDebounce=setTimeout(_performSave,800);
+}
+async function _performSave(){
   // 1) Garantir token
   if(!ghToken()){
     await new Promise(resolve=>{
