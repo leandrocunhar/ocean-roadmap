@@ -72,6 +72,17 @@
         "c": "1. Aguardar CNPJ\n2. Comparar bancos digitais\n3. Abrir conta e ativar",
         "re": "",
         "co": ""
+      },
+      {
+        "id": "f0_1783349616811",
+        "t": "Nova tarefa",
+        "p": "",
+        "s": "Iniciar",
+        "a": "",
+        "r": "",
+        "c": "",
+        "re": "",
+        "co": ""
       }
     ]
   },
