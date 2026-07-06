@@ -1167,12 +1167,27 @@ async function load(){
   // ── Carga normal do JSONbin ──
   try{
     const res=await fetch(JBIN_URL+'/latest',{headers:{'X-Master-Key':JBIN_KEY}});
-    if(res.ok){const j=await res.json();if(j.record&&j.record.length){data=j.record;return;}}
+    if(res.ok){
+      const j=await res.json();
+      if(j.record&&Array.isArray(j.record)&&j.record.length){
+        data=j.record;
+        console.log('[Ocean Roadmap] Carregado do JSONbin:',j.record.length,'grupos');
+        return;
+      }
+    }
   }catch(e){console.warn('[Ocean Roadmap] JSONbin load error:',e);}
-  // ── Fallback: roadmap-data.json no GitHub ──
+  // ── Fallback: roadmap-data.json no GitHub (auto-salva no JSONbin) ──
   try{
     const res=await fetch('https://raw.githubusercontent.com/leandrocunhar/ocean-roadmap/main/roadmap-data.json?t='+Date.now());
-    if(res.ok){const d=await res.json();if(d&&d.length){data=d;_pendingMigration=true;return;}}
+    if(res.ok){
+      const d=await res.json();
+      if(d&&Array.isArray(d)&&d.length){
+        data=d;
+        console.log('[Ocean Roadmap] Fallback GitHub: carregados',d.length,'grupos. Auto-salvando no JSONbin...');
+        setTimeout(()=>_triggerSave(),1500);
+        return;
+      }
+    }
   }catch(e){console.warn('[Ocean Roadmap] GitHub fallback error:',e);}
   data=JSON.parse(JSON.stringify(DEF));
 }
