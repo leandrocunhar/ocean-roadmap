@@ -294,8 +294,8 @@
         "t": "Criar controle financeiro + Dashboard",
         "p": "Ago/26",
         "s": "Em andamento",
-        "a": "Tecnologia",
-        "r": "Fernando, Leandro, Especialista",
+        "a": "Finanças / Tecnologia",
+        "r": "Fernando, Leandro",
         "c": "1. Definir KPIs financeiros\n2. Revisar dashboard\n3. Integração Maggo\n3. Apresentação mensal",
         "re": "",
         "co": ""
@@ -312,7 +312,7 @@
         "co": ""
       },
       {
-        "id": "okr4_1783615221075",
+        "id": "okr4_1783615222919",
         "t": "Nova tarefa",
         "p": "",
         "s": "Iniciar",
