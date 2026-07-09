@@ -291,7 +291,7 @@
       },
       {
         "id": "o4t4",
-        "t": "Criar controle financeiro + Dashboard",
+        "t": "Organizar controle financeiro + Criar ERP",
         "p": "Ago/26",
         "s": "Em andamento",
         "a": "Finanças / Tecnologia",
@@ -307,17 +307,6 @@
         "s": "Iniciar",
         "a": "Tecnologia",
         "r": "Leandro",
-        "c": "",
-        "re": "",
-        "co": ""
-      },
-      {
-        "id": "okr4_1783615222919",
-        "t": "Migração Google Workspace",
-        "p": "",
-        "s": "Adiado",
-        "a": "Tecnologia",
-        "r": "Fernando, Especialista",
         "c": "",
         "re": "",
         "co": ""
@@ -377,11 +366,11 @@
     "tasks": [
       {
         "id": "o6t4",
-        "t": "Lançar site/plataforma (PT + ENG)",
+        "t": "Lançar site atualizado (PT + ENG)",
         "p": "Out/26",
         "s": "Bloqueado",
         "a": "Marketing",
-        "r": "Fábio, Leandro, Especialista",
+        "r": "Leandro, Fábio",
         "c": "1. Definir estrutura e textos\n2. Desenvolver com parceiro\n3. Publicar e testar",
         "re": "Site no ar em PT e ENG com novo posicionamento",
         "co": ""
