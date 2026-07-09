@@ -291,7 +291,7 @@
       },
       {
         "id": "o4t4",
-        "t": "Organizar controle financeiro + Criar ERP",
+        "t": "Criar controle financeiro + Dashboard",
         "p": "Ago/26",
         "s": "Em andamento",
         "a": "Finanças / Tecnologia",
@@ -304,7 +304,7 @@
         "id": "okr4_1783308308926",
         "t": "Integração Maggo",
         "p": "Ago/26",
-        "s": "Em andamento",
+        "s": "Iniciar",
         "a": "Tecnologia",
         "r": "Leandro",
         "c": "",
@@ -312,12 +312,12 @@
         "co": ""
       },
       {
-        "id": "okr4_1783615299763",
-        "t": "Automações / IA",
+        "id": "okr4_1783615346211",
+        "t": "Nova tarefa",
         "p": "",
-        "s": "Adiado",
-        "a": "Tecnologia",
-        "r": "Leandro, Especialista",
+        "s": "Iniciar",
+        "a": "",
+        "r": "",
         "c": "",
         "re": "",
         "co": ""
