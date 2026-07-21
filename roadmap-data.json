@@ -128,6 +128,17 @@
         "co": ""
       },
       {
+        "id": "o1t5",
+        "t": "Formalizar contratos com prestadores",
+        "p": "Jul/26",
+        "s": "Iniciar",
+        "a": "Jurídico",
+        "r": "Fernando, Fábio, Leandro",
+        "c": "1. Listar todos os prestadores ativos\n2. Revisar modelo de contrato\n3. Adaptar para cada perfil\n4. Assinar",
+        "re": "",
+        "co": ""
+      },
+      {
         "id": "o1t6",
         "t": "Revisar cadência de reuniões de gestão",
         "p": "Jul/26",
@@ -157,17 +168,6 @@
         "a": "Operações",
         "r": "",
         "c": "",
-        "re": "",
-        "co": ""
-      },
-      {
-        "id": "o1t5",
-        "t": "Formalizar contratos com prestadores",
-        "p": "Jul/26",
-        "s": "Iniciar",
-        "a": "Jurídico",
-        "r": "Fernando, Fábio, Leandro",
-        "c": "1. Listar todos os prestadores ativos\n2. Revisar modelo de contrato\n3. Adaptar para cada perfil\n4. Assinar",
         "re": "",
         "co": ""
       },
