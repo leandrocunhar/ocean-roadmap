@@ -72,6 +72,17 @@
         "c": "1. Aguardar CNPJ\n2. Comparar bancos digitais\n3. Abrir conta e ativar",
         "re": "",
         "co": ""
+      },
+      {
+        "id": "f0_1784651713645",
+        "t": "Nova tarefa",
+        "p": "",
+        "s": "Iniciar",
+        "a": "",
+        "r": "",
+        "c": "",
+        "re": "",
+        "co": ""
       }
     ]
   },
@@ -89,7 +100,7 @@
         "p": "Jul/26",
         "s": "Validar",
         "a": "Governança",
-        "r": "Leandro, Fábio, Fernando",
+        "r": "Leandro",
         "c": "1. Mapear funções atuais\n2. Desenhar cenários\n3. Definir responsabilidades\n4. Validar com Fábio e Fernando",
         "re": "",
         "co": ""
@@ -100,7 +111,7 @@
         "p": "Jun/26",
         "s": "Validar",
         "a": "Financeiro",
-        "r": "Leandro, Fábio, Fernando",
+        "r": "Leandro",
         "c": "1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time",
         "re": "",
         "co": ""
@@ -111,7 +122,7 @@
         "p": "Jul/26",
         "s": "Validar",
         "a": "Governança",
-        "r": "Leandro, Fábio, Fernando",
+        "r": "Leandro",
         "c": "1. Definir níveis (Jr/Pl/Sr/Lead)\n2. Criar critérios de progressão\n3. Vincular ao modelo de remuneração",
         "re": "",
         "co": ""
@@ -122,7 +133,7 @@
         "p": "Jul/26",
         "s": "Em andamento",
         "a": "Operações",
-        "r": "Fábio",
+        "r": "Fábio, Leandro",
         "c": "1. Agendar reunião individual com cada pessoa\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar",
         "re": "",
         "co": ""
