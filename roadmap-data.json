@@ -312,17 +312,6 @@
     "horizonte": "Horizonte 2 — Estabilizar",
     "tasks": [
       {
-        "id": "okr4_solicitar_cartao",
-        "t": "Solicitar cartão de crédito",
-        "a": "Finanças",
-        "s": "Em andamento",
-        "r": "Fábio, Fernando",
-        "p": "Jul/26",
-        "co": "",
-        "c": "",
-        "re": ""
-      },
-      {
         "id": "okr4_1784730367307",
         "t": "Contratar especialista",
         "p": "Jul/26",
@@ -332,6 +321,17 @@
         "c": "",
         "re": "",
         "co": ""
+      },
+      {
+        "id": "okr4_solicitar_cartao",
+        "t": "Solicitar cartão de crédito",
+        "a": "Finanças",
+        "s": "Em andamento",
+        "r": "Fábio, Fernando",
+        "p": "Jul/26",
+        "co": "",
+        "c": "",
+        "re": ""
       },
       {
         "id": "okr4_1784670778516",
