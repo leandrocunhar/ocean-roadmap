@@ -334,17 +334,6 @@
         "co": ""
       },
       {
-        "id": "okr4_1784670778516",
-        "t": "Gestão da informação",
-        "p": "Ago/26",
-        "s": "Bloqueado",
-        "a": "Governança",
-        "r": "Fernando, Leandro",
-        "c": "Matheus\n1. Ajustar / Migrar Google Workspace\n1. Juntar com JP para definir permissões sobre os documentos da Ocean (Drive)\n2. Aplicar permissões",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "okr4_1783308308926",
         "t": "Integração Maggo",
         "p": "Ago/26",
@@ -363,6 +352,17 @@
         "a": "Tecnologia",
         "r": "Leandro, Especialista",
         "c": "",
+        "re": "",
+        "co": ""
+      },
+      {
+        "id": "okr4_1784670778516",
+        "t": "Gestão da informação",
+        "p": "Ago/26",
+        "s": "Bloqueado",
+        "a": "Governança",
+        "r": "Fernando, Leandro",
+        "c": "Matheus\n1. Ajustar / Migrar Google Workspace\n2. A\n1. Juntar com JP para definir permissões sobre os documentos da Ocean (Drive)\n2. Aplicar permissões",
         "re": "",
         "co": ""
       }
