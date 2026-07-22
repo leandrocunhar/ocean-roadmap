@@ -323,17 +323,6 @@
         "re": ""
       },
       {
-        "id": "o4t4",
-        "t": "Organizar controle financeiro + Criar ERP",
-        "p": "Ago/26",
-        "s": "Em andamento",
-        "a": "Finanças / Tecnologia",
-        "r": "Fernando, Leandro",
-        "c": "1. Definir KPIs financeiros\n2. Revisar dashboard\n3. Integração Maggo\n3. Apresentação mensal",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "okr4_1784670778516",
         "t": "Gestão da informação",
         "p": "Ago/26",
@@ -341,6 +330,17 @@
         "a": "Governança",
         "r": "Fernando, Leandro",
         "c": "Matheus\n1. Ajustar roadmap\n2. Google Workspace (exportar email dos arquivados + migração de CNPJ)\n3. ERP\n4. Automação de processos / IA (Contratos, Operações, Marketing)\n5. Site\n\nInterno\n1. Juntar com JP para definir e aplicar permissões sobre os documentos da Ocean (Drive)",
+        "re": "",
+        "co": ""
+      },
+      {
+        "id": "o4t4",
+        "t": "Organizar controle financeiro + Criar ERP",
+        "p": "Ago/26",
+        "s": "Em andamento",
+        "a": "Finanças / Tecnologia",
+        "r": "Fernando, Leandro",
+        "c": "1. Definir KPIs financeiros\n2. Revisar dashboard\n3. Integração Maggo\n3. Apresentação mensal",
         "re": "",
         "co": ""
       },
