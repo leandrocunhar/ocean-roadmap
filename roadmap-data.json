@@ -340,7 +340,7 @@
         "s": "Bloqueado",
         "a": "Governança",
         "r": "Fernando, Leandro",
-        "c": "Matheus\n1. Ajustar roadmap\n2. Google Workspace (exportar email dos arquivados + migração de CNPJ)\n3. Site\n\nInterno\n1. Juntar com JP para definir e aplicar permissões sobre os documentos da Ocean (Drive)",
+        "c": "Matheus\n1. Ajustar roadmap\n2. Google Workspace (exportar email dos arquivados + migração de CNPJ)\n3. ERP\n4. Automação de processos / IA (Contratos, Operações, Marketing)\n5. Site\n\nInterno\n1. Juntar com JP para definir e aplicar permissões sobre os documentos da Ocean (Drive)",
         "re": "",
         "co": ""
       },
@@ -362,18 +362,7 @@
         "s": "Adiado",
         "a": "Tecnologia",
         "r": "Leandro, Especialista",
-        "c": "",
-        "re": "",
-        "co": ""
-      },
-      {
-        "id": "okr4_1784730100196",
-        "t": "3. Automação de processos / IA",
-        "p": "",
-        "s": "Iniciar",
-        "a": "",
-        "r": "",
-        "c": "",
+        "c": "(Contratos, Operações, Marketing)",
         "re": "",
         "co": ""
       }
