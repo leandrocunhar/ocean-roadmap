@@ -84,17 +84,6 @@
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
       {
-        "id": "okr1_1784737546588",
-        "t": "mudança",
-        "p": "Ago/26",
-        "s": "Adiado",
-        "a": "tecnologia",
-        "r": "Leandro",
-        "c": "1. um \n2.\n3.",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "o1t1",
         "t": "Revisar organograma e papéis",
         "p": "Jul/26",
@@ -201,6 +190,17 @@
         "a": "Operações",
         "r": "",
         "c": "",
+        "re": "",
+        "co": ""
+      },
+      {
+        "id": "okr1_1784737546588",
+        "t": "mudança",
+        "p": "Ago/26",
+        "s": "Adiado",
+        "a": "tecnologia",
+        "r": "Leandro",
+        "c": "1. um \n2.\n3.",
         "re": "",
         "co": ""
       }
