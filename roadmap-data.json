@@ -8,17 +8,6 @@
     "horizonte": "",
     "tasks": [
       {
-        "id": "f0t1",
-        "t": "Compartilhar acessos",
-        "p": "Jun/26",
-        "s": "Feito",
-        "a": "Tecnologia",
-        "r": "Fernando",
-        "c": "1. Solicitar acesso às planilhas\n2. Organizar documentos no Drive\n3. Compartilhar diretrizes de R&S",
-        "re": "Planilha de controle, organograma e diretrizes R&S disponíveis",
-        "co": "Jun/26"
-      },
-      {
         "id": "f0t3",
         "t": "Organizar comunicação (agenda e pautas)",
         "p": "Jun/26",
