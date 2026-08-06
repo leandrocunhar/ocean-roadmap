@@ -17,17 +17,6 @@
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
       {
-        "id": "okr1_avaliacao_equipe",
-        "t": "Iniciar avaliação de desempenho",
-        "a": "RH",
-        "s": "Bloqueado",
-        "r": "Leandro",
-        "p": "Ago/26",
-        "co": "",
-        "c": "",
-        "re": ""
-      },
-      {
         "id": "o1t7",
         "t": "Criar sistema de gestão de contratos",
         "p": "Ago/26",
