@@ -33,30 +33,7 @@
     "color": "orange",
     "colorL": "#fff8ee",
     "horizonte": "Horizonte 2 — Estabilizar · Recorrente",
-    "tasks": [
-      {
-        "id": "o3t1",
-        "t": "Definir perfis target",
-        "p": "Ago/26",
-        "s": "Bloqueado",
-        "a": "Operações",
-        "r": "Fábio, Leandro",
-        "c": "1. Analisar histórico de mandatos\n2. Identificar perfis mais demandados\n3. Priorizar 3-5 segmentos",
-        "re": "Lista de segmentos/níveis prioritários definida",
-        "co": ""
-      },
-      {
-        "id": "o3t2",
-        "t": "Estruturar banco de candidatos por vertical",
-        "p": "Ago/26",
-        "s": "Bloqueado",
-        "a": "Tecnologia",
-        "r": "Leandro, Fernando",
-        "c": "1. Tags Maggo",
-        "re": "",
-        "co": ""
-      }
-    ]
+    "tasks": []
   },
   {
     "id": "okr4",
