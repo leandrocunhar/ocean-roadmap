@@ -15,19 +15,7 @@
     "color": "red",
     "colorL": "#fff0ee",
     "horizonte": "Horizonte 1 — Resolver",
-    "tasks": [
-      {
-        "id": "okr1_1784924939675",
-        "t": "Resolver sobre Regus (renovação automática)",
-        "p": "",
-        "s": "Em andamento",
-        "a": "Administrativo",
-        "r": "Fábio, Fernando, Leandro",
-        "c": "",
-        "re": "",
-        "co": ""
-      }
-    ]
+    "tasks": []
   },
   {
     "id": "okr2",
