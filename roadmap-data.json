@@ -8,17 +8,6 @@
     "horizonte": "",
     "tasks": [
       {
-        "id": "f0t2",
-        "t": "Diagnóstico + Estrutura Roadmap",
-        "p": "Jun/26",
-        "s": "Feito",
-        "a": "Governança",
-        "r": "Leandro",
-        "c": "1. Levantar dados financeiros e operacionais\n2. Entrevistar Fábio e Fernando\n3. Construir dashboard\n4. Validar diagnóstico",
-        "re": "Dashboard Diagnóstico Ocean validado por Fábio e Fernando",
-        "co": "Jun/26"
-      },
-      {
         "id": "f0t4",
         "t": "Abrir CNPJ Leandro (Advisory)",
         "p": "Jul/26",
