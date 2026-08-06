@@ -26,17 +26,6 @@
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
       {
-        "id": "okr2_implantar_crm",
-        "t": "Implantar CRM / pipeline de oportunidades",
-        "a": "Tecnologia",
-        "s": "Em andamento",
-        "r": "Leandro, IA",
-        "p": "Jul/26",
-        "co": "",
-        "c": "",
-        "re": ""
-      },
-      {
         "id": "o2t1",
         "t": "Implementar metas e KPIs comerciais",
         "p": "Jul/26",
