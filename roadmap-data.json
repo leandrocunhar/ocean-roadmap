@@ -17,17 +17,6 @@
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
       {
-        "id": "o1t2",
-        "t": "Revisar e simplificar modelo de remuneração",
-        "p": "Jun/26",
-        "s": "Validar",
-        "a": "Financeiro",
-        "r": "Leandro",
-        "c": "1. Mapear modelo atual (NPCB e faixas)\n2. Pesquisar benchmarks do setor\n3. Desenhar 2-3 cenários alternativos\n4. Apresentar e definir com Fábio\n5. Comunicar ao time",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "o1t3",
         "t": "Desenhar plano de carreira",
         "p": "Jul/26",
