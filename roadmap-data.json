@@ -17,17 +17,6 @@
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
       {
-        "id": "o1t6",
-        "t": "Revisar cadência de reuniões de gestão",
-        "p": "Jul/26",
-        "s": "Bloqueado",
-        "a": "Governança",
-        "r": "Fábio, Leandro, Fernando",
-        "c": "1. BD (Seg/Qui) + Delivery (Ter/Sex) + All (Qua)\n2. Organizar pautas",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "okr1_avaliacao_equipe",
         "t": "Iniciar avaliação de desempenho",
         "a": "RH",
