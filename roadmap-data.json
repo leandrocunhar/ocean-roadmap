@@ -6,19 +6,7 @@
     "color": "gray",
     "colorL": "#f2f2f7",
     "horizonte": "",
-    "tasks": [
-      {
-        "id": "f0t5",
-        "t": "Abrir conta PJ",
-        "p": "Jul/26",
-        "s": "Bloqueado",
-        "a": "Financeiro",
-        "r": "Leandro",
-        "c": "1. Aguardar CNPJ\n2. Comparar bancos digitais\n3. Abrir conta e ativar",
-        "re": "",
-        "co": ""
-      }
-    ]
+    "tasks": []
   },
   {
     "id": "okr1",
