@@ -26,17 +26,6 @@
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
       {
-        "id": "o2t1",
-        "t": "Implementar metas e KPIs comerciais",
-        "p": "Jul/26",
-        "s": "Bloqueado",
-        "a": "Operações",
-        "r": "Leandro, Fábio",
-        "c": "1. Definir KPIs por papel\n2. Criar dashboard de acompanhamento\n3. Revisar semanalmente",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "o2t2",
         "t": "Organizar prospecção",
         "p": "Jul/26",
