@@ -24,19 +24,7 @@
     "color": "red",
     "colorL": "#fff0ee",
     "horizonte": "Horizonte 1 — Resolver",
-    "tasks": [
-      {
-        "id": "okr2_1784644062652",
-        "t": "Newsletter interna",
-        "p": "",
-        "s": "Adiado",
-        "a": "Comercial",
-        "r": "Leandro, IA",
-        "c": "",
-        "re": "",
-        "co": ""
-      }
-    ]
+    "tasks": []
   },
   {
     "id": "okr3",
