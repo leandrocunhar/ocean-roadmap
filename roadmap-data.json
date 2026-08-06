@@ -8,17 +8,6 @@
     "horizonte": "",
     "tasks": [
       {
-        "id": "f0t3",
-        "t": "Organizar comunicação (agenda e pautas)",
-        "p": "Jun/26",
-        "s": "Feito",
-        "a": "Governança",
-        "r": "Leandro, Fábio, Fernando",
-        "c": "1. Definir cadência de reuniões\n2. Criar template de pauta\n3. Definir canal oficial (WhatsApp, e-mail)",
-        "re": "Agenda semanal ativa com pauta padrão",
-        "co": "Jun/26"
-      },
-      {
         "id": "f0t2",
         "t": "Diagnóstico + Estrutura Roadmap",
         "p": "Jun/26",
