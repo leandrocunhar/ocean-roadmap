@@ -17,17 +17,6 @@
     "horizonte": "Horizonte 1 — Resolver",
     "tasks": [
       {
-        "id": "o1t4",
-        "t": "Discutir com equipe e comunicar mudanças",
-        "p": "Jul/26",
-        "s": "Em andamento",
-        "a": "Operações",
-        "r": "Fábio, Leandro",
-        "c": "1. Agendar reunião individual\n2. Apresentar novo modelo de forma positiva\n3. Coletar dúvidas e endereçar",
-        "re": "",
-        "co": ""
-      },
-      {
         "id": "o1t5",
         "t": "Formalizar contratos com prestadores",
         "p": "Jul/26",
